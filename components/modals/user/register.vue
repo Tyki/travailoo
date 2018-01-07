@@ -37,7 +37,8 @@
       <v-card-actions>
         <v-spacer></v-spacer>
         <v-btn color="blue darken-1" flat @click.native="openLogin">{{ $t('modals.register.already_have_account') }}</v-btn>
-        <v-btn color="blue darken-1" @click.native="registerUser">{{ $t('modals.register.register') }}</v-btn>
+        <v-btn v-if="!working" color="blue darken-1" @click.native="registerUser">{{ $t('modals.register.register') }}</v-btn>
+        <v-progress-circular v-else indeterminate color="primary"></v-progress-circular>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -56,6 +57,7 @@ export default {
     email: '',
     password: '',
     second_password: '',
+    working: false,
     // TODO:  Find a way to inject translated rules
     emailRules: [
       (v) => !!v || 'l\'email est requis',
@@ -88,6 +90,9 @@ export default {
           return
         }
 
+        // Forbid the user to double click and create two accounts ^_^
+        this.working = true
+
         const email = this.email.toLowerCase()
 
         // Creating the user in the backend
@@ -109,17 +114,20 @@ export default {
               message: this.$t('success.account_created')
             })
 
+            this.working = false
+
             // TODO : connect the user?
             // TODO : reset v-models
             this.$eventBus.$emit('Modals::close')
           }).catch(error => {
+            this.working = false
             if (error.status === 412) {
               // Email already exists!
               this.$toasted.global.toastError({
                 message: this.$t('errors.email_already_exists')
               })
             } else {
-
+              this.$toasted.global.toastError()
             }
           })
       }
@@ -128,13 +136,10 @@ export default {
   mounted () {
     this.$eventBus.$on('Modals::openRegister', () => {
       this.dialog = true
-      console.log('opening Register')
     })
 
     this.$eventBus.$on('Modals::close', () => {
       this.dialog = false
-
-      console.log('close modals')
     })
   }
 }

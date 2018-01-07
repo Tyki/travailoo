@@ -24,9 +24,11 @@
     "email_not_same": "Les mots de passes ne correspondent pas"
   },
   "errors": {
-    "email_already_exists": "Cet email existe déjà"
+    "email_already_exists": "Cet email existe déjà",
+    "wrong_credentials": "Mauvais login ou mot de passe"
   },
   "success": {
-    "account_created": "Votre compte à bien été crée!"
+    "account_created": "Votre compte à bien été crée!",
+    "logged": "Connexion réussie!"
   }
 }

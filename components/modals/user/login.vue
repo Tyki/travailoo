@@ -1,15 +1,17 @@
 <template lang="html">
   <v-layout row justify-center>
     <v-dialog v-model="dialog" max-width="350px" transition="scale-transition" origin="center center">
-      <!-- <v-container grid-list-md>
-        <v-layout wrap>
-          <v-flex xs6>
-            <div style="background-color: white;">
+      <v-card>
+        <v-card-title>
+          <span class="headline">{{ $t('modals.login.title') }}</span>
+        </v-card-title>
+        <v-card-text>
+          <v-form v-model="valid" ref="form" lazy-validation>
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12>
                   <v-text-field
-                    label="E-mail"
+                    :label="$t('modals.login.email_label')"
                     v-model="email"
                     :rules="emailRules"
                   ></v-text-field>
@@ -17,99 +19,26 @@
 
                 <v-flex xs12>
                   <v-text-field
-                    label="Mot de passe"
+                    :label="$t('modals.login.password_label')"
                     v-model="password"
+                    type="password"
                   ></v-text-field>
                 </v-flex>
 
                 <v-flex xs8>
                   <v-checkbox
-                    label="Rester connecter?"
+                    :label="$t('modals.login.stay_connnected_label')"
                     v-model="stayConnected"
                   ></v-checkbox>
                 </v-flex>
               </v-layout>
             </v-container>
-            </div>
-          </v-flex>
-
-          <v-flex xs6>
-            <v-card>
-              <v-card-title>
-                <span class="headline">Connexion</span>
-              </v-card-title>
-              <v-card-text>
-                <v-container grid-list-md>
-                  <v-layout wrap>
-                    <v-flex xs12>
-                      <v-text-field
-                        label="E-mail"
-                        v-model="email"
-                        :rules="emailRules"
-                      ></v-text-field>
-                    </v-flex>
-
-                    <v-flex xs12>
-                      <v-text-field
-                        label="Mot de passe"
-                        v-model="password"
-                      ></v-text-field>
-                    </v-flex>
-
-                    <v-flex xs8>
-                      <v-checkbox
-                        label="Rester connecter?"
-                        v-model="stayConnected"
-                      ></v-checkbox>
-                    </v-flex>
-                  </v-layout>
-                </v-container>
-              </v-card-text>
-              <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn color="blue darken-1" @click.native="LogUser">Se connecter</v-btn>
-              </v-card-actions>
-
-            </v-card>
-          </v-flex>
-        </v-layout>
-      <!-- </v-container> --> -->
-
-      <v-card>
-        <v-card-title>
-          <span class="headline">{{ $t('modals.login.title') }}</span>
-        </v-card-title>
-        <v-card-text>
-          <v-container grid-list-md>
-            <v-layout wrap>
-              <v-flex xs12>
-                <v-text-field
-                  :label="$t('modals.login.email_label')"
-                  v-model="email"
-                  :rules="emailRules"
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex xs12>
-                <v-text-field
-                  :label="$t('modals.login.password_label')"
-                  v-model="password"
-                ></v-text-field>
-              </v-flex>
-
-              <v-flex xs8>
-                <v-checkbox
-                  :label="$t('modals.login.stay_connnected_label')"
-                  v-model="stayConnected"
-                ></v-checkbox>
-              </v-flex>
-            </v-layout>
-          </v-container>
+          </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="blue darken-1" flat @click.native="openRegister">{{ $t('modals.login.register') }}</v-btn>
-          <v-btn color="blue darken-1" @click.native="LogUser">{{ $t('modals.login.connect') }}</v-btn>
+          <v-btn color="blue darken-1" @click.native="logUser">{{ $t('modals.login.connect') }}</v-btn>
         </v-card-actions>
 
       </v-card>
@@ -124,6 +53,7 @@ export default {
   name: 'login',
   data: () => ({
     dialog: false,
+    valid: false,
     email: '',
     password: '',
     stayConnected: true,
@@ -135,7 +65,37 @@ export default {
   }),
   methods: {
     logUser () {
-      this.dialog = false
+      this.$kuzzle.loginPromise('local',
+        {
+          username: this.email.toLowerCase(),
+          password: this.password
+        }, this.stayConnected ? '385 days' : '12h')
+        .then((response) => {
+          // Store JWT in LocalStorage if the user checked stayConnectedf
+          if (this.stayConnected) {
+            localStorage.setItem('jwt', response.jwt)
+          }
+
+          return this.$kuzzle.whoAmIPromise()
+        })
+        .then((user) => {
+          // TODO, store user status somewhere in vueX
+          this.$toasted.global.toastSuccess({
+            message: this.$t('success.logged')
+          })
+
+          this.$eventBus.$emit('Modals::close')
+        })
+        .catch((error) => {
+          if (error.status === 401) {
+            // Wrong credentials
+            this.$toasted.global.toastError({
+              message: this.$t('errors.wrong_credentials')
+            })
+          } else {
+            this.$toasted.global.toastError()
+          }
+        })
     },
     openRegister () {
       openSpecificModal('openRegister')
@@ -148,8 +108,6 @@ export default {
 
     this.$eventBus.$on('Modals::close', () => {
       this.dialog = false
-
-      console.log('close modals')
     })
   }
 }
