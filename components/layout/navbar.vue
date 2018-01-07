@@ -23,9 +23,19 @@
 
     <!-- Right buttons -->
     <div class="d-flex align-center" style="margin-left: auto">
-      <v-btn flat @click="open('openLogin')">Se connecter</v-btn>
-      <span>ou</span>
-      <v-btn flat @click="open('openRegister')">S'inscrire</v-btn>
+      <!-- Anonymous actions: login/register -->
+      <div v-if="!isUserLogged">
+        <v-btn flat @click="open('openLogin')">{{ $t('common.connect') }}</v-btn>
+        <span>ou</span>
+        <v-btn flat @click="open('openRegister')">{{ $t('common.register') }}</v-btn>
+      </div>
+
+      <!-- Say Hello ! -->
+      <div v-else>
+        <v-btn flat @click="$eventBus.$emit('User::toggleDrawer')">
+          {{ $t('common.hello') }} {{ userInformations.firstname }}
+        </v-btn>
+      </div>
     </div>
 
   </v-toolbar>
@@ -36,6 +46,14 @@ import { openSpecificModal } from '~/helpers/eventBus'
 
 export default {
   name: 'navbar',
+  computed: {
+    isUserLogged () {
+      return this.$store.state.isUserLogged
+    },
+    userInformations () {
+      return this.$store.state.userInformations
+    }
+  },
   methods: {
     open (event) {
       openSpecificModal(event)

@@ -3,10 +3,23 @@
     <v-list>
 
       <avatar-tile />
-      <v-divider></v-divider>
 
-      <!-- Menu actions -->
-      <template v-for="(item, i) in items">
+      <v-list-tile @click="logoutUser" v-if="isUserLogged">
+        <v-list-tile-action>
+          <v-icon>clear</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            Se déconnecter
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
+
+      <!-- <v-divider />
+      <v-divider /> -->
+
+      <!-- Menu actions : copy paste-->
+      <!-- <template v-for="(item, i) in items">
         <v-list-group v-if="item.children" v-model="item.model" no-action>
             <v-list-tile slot="item" @click="">
 
@@ -37,7 +50,7 @@
 
         <div v-else>
         <v-divider v-if="item.dividerTop"></v-divider>
-        <v-list-tile @click="">
+        <v-list-tile @click="item.function">
           <v-list-tile-action>
             <v-icon>{{ item.icon }}</v-icon>
           </v-list-tile-action>
@@ -50,7 +63,7 @@
         <v-divider v-if="item.dividerBot"></v-divider>
       </div>
 
-      </template>
+      </template> -->
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -66,9 +79,9 @@ export default {
   data: () => ({
     drawer: false,
     items: [
-      { icon: 'account_circle', text: 'Mes informations' },
-      { icon: 'youtube_searched_for', text: 'Mes recherches' },
-      { icon: 'my_library_books', text: 'Mes messages', dividerBot: true },
+      { icon: 'account_circle', text: 'Mes informations' }, // TODO
+      { icon: 'youtube_searched_for', text: 'Mes recherches' }, // TODO
+      { icon: 'my_library_books', text: 'Mes messages', dividerBot: true }, // TODO
       {
         icon: 'keyboard_arrow_up',
         'icon-alt': 'keyboard_arrow_down',
@@ -78,10 +91,24 @@ export default {
           { icon: 'add', text: 'Create label' }
         ]
       },
-      { icon: 'settings', text: 'Mes préférences', dividerTop: true },
-      { icon: 'clear', text: 'Se déconnecter' }
+      { icon: 'settings', text: 'Mes préférences', dividerTop: true }, // TODO
+      { icon: 'clear', text: 'Se déconnecter' } // Done
     ]
   }),
+  computed: {
+    isUserLogged () {
+      return this.$store.state.isUserLogged
+    }
+  },
+  methods: {
+    logoutUser () {
+      this.$kuzzle.logoutPromise()
+        .then(() => {
+          this.$store.commit('changeLoggedStatus', false)
+          this.$store.commit('updateUserFirstname', '')
+        })
+    }
+  },
   mounted () {
     this.$eventBus.$on('User::toggleDrawer', () => {
       this.drawer = !this.drawer

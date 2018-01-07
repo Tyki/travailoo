@@ -1,17 +1,48 @@
 <template lang="html">
-  <v-list-tile avatar>
-    <v-list-tile-avatar>
-      <img src="https://randomuser.me/api/portraits/men/85.jpg" />
-    </v-list-tile-avatar>
-    <v-list-tile-content>
-      <v-list-tile-title>Bonjour + PRENOM - [TODO]</v-list-tile-title>
-    </v-list-tile-content>
-  </v-list-tile>
+  <div >
+    <v-list-tile avatar v-if="isUserLogged">
+      <v-list-tile-avatar>
+        <img src="https://res.cloudinary.com/closebrace/image/upload/w_400/v1491315007/usericon_id76rb.png" />
+      </v-list-tile-avatar>
+      <v-list-tile-content>
+        <v-list-tile-title>
+          {{ $t('common.hello') }} {{ userInformations.firstname }}
+        </v-list-tile-title>
+      </v-list-tile-content>
+    </v-list-tile>
+
+    <v-list-tile avatar v-else>
+      <v-list-tile-avatar>
+        <img src="https://res.cloudinary.com/closebrace/image/upload/w_400/v1491315007/usericon_id76rb.png" />
+      </v-list-tile-avatar>
+      <v-list-tile-content>
+        <v-list-tile-title>
+          <span @click="open('openLogin')">{{ $t('common.connect') }}</span>
+        </v-list-tile-title>
+      </v-list-tile-content>
+    </v-list-tile>
+    <v-divider></v-divider>
+  </div>
 </template>
 
 <script>
+import { openSpecificModal } from '~/helpers/eventBus'
+
 export default {
-  name: 'avatarTile'
+  name: 'avatarTile',
+  computed: {
+    isUserLogged () {
+      return this.$store.state.isUserLogged
+    },
+    userInformations () {
+      return this.$store.state.userInformations
+    }
+  },
+  methods: {
+    open (event) {
+      openSpecificModal(event)
+    }
+  }
 }
 </script>
 

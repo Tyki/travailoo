@@ -76,10 +76,16 @@ export default {
             localStorage.setItem('jwt', response.jwt)
           }
 
+          // Store loggedStatus
+          this.$store.commit('changeLoggedStatus', true)
+
           return this.$kuzzle.whoAmIPromise()
         })
         .then((user) => {
-          // TODO, store user status somewhere in vueX
+          if (user.hasOwnProperty('content') && user.content.hasOwnProperty('firstname')) {
+            this.$store.commit('updateUserFirstname', user.content.firstname)
+          }
+
           this.$toasted.global.toastSuccess({
             message: this.$t('success.logged')
           })
