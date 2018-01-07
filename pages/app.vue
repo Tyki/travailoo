@@ -1,5 +1,5 @@
 <template lang="html">
-  <v-app dark id="inspire">
+  <v-app white id="inspire">
     <!-- Navbar and user left menu -->
     <user-drawer-wrapper />
     <navbar />
@@ -9,6 +9,10 @@
 
     <!-- Right panel to show jobs -->
     <job-drawer-wrapper />
+
+    <!-- Wrapper modals -->
+    <modal-wrapper />
+
   </v-app>
 </template>
 
@@ -17,13 +21,15 @@ import navbar from '~/components/layout/navbar'
 import mapWrapper from '~/components/layout/mapWrapper'
 import jobDrawerWrapper from '~/components/layout/job/jobDrawerWrapper'
 import userDrawerWrapper from '~/components/layout/user/userDrawerWrapper'
+import modalWrapper from '~/components/modals/modalWrapper'
 
 export default {
   components: {
     navbar,
     mapWrapper,
     jobDrawerWrapper,
-    userDrawerWrapper
+    userDrawerWrapper,
+    modalWrapper
   }
 }
 </script>

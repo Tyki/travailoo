@@ -1,6 +1,5 @@
 <template lang="html">
-  <v-dialog v-model="dialog" persistent max-width="500px">
-    <v-btn color="primary" dark slot="activator">REGISTER</v-btn>
+  <v-dialog v-model="dialog" max-width="500px">
     <v-card>
       <v-card-title>
         <span class="headline">User Profile</span>
@@ -57,6 +56,22 @@
 
 <script>
 export default {
+  name: 'register',
+  data: () => ({
+    dialog: false
+  }),
+  mounted () {
+    this.$eventBus.$on('Modals::openRegister', () => {
+      this.dialog = true
+      console.log('opening Register')
+    })
+
+    this.$eventBus.$on('Modals::close', () => {
+      this.dialog = false
+
+      console.log('close modals')
+    })
+  }
 }
 </script>
 

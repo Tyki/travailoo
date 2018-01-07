@@ -1,7 +1,7 @@
 <template lang="html">
   <div>
-    <register v-if="showRegister"/>
-    <login v-if="showLogin" />
+    <register />
+    <login />
   </div>
 </template>
 
@@ -15,29 +15,9 @@ export default {
     Register,
     Login
   },
-  data(() => {
-    showRegister: false,
-    showLogin: false
-  }),
-  methods: {
-    resetModals () {
-      this.showRegister = false
-      this.showLogin = false
-    }
-  },
-  mounted () {
-    // Init the eventBus
-    this.$eventBus.on('modals::openLogin', () => {
-      this.resetModals()
-      console.log('opening Login')
-    })
+  data: () => ({
 
-    this.$eventBus.on('modals::openRegister', () => {
-      this.resetModals()
-      console.log('opening Register')
-    })
-
-  }
+  })
 }
 </script>
 

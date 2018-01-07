@@ -1,64 +1,159 @@
 <template lang="html">
-  <v-dialog v-model="dialog" persistent max-width="500px">
-    <v-btn color="primary" dark slot="activator">LOGIN</v-btn>
-    <v-card>
-      <v-card-title>
-        <span class="headline">User Profile</span>
-      </v-card-title>
-      <v-card-text>
-        <v-container grid-list-md>
-          <v-layout wrap>
-            <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal first name" required></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal middle name" hint="example of helper text only on focus"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal last name" hint="example of persistent helper text"
-                persistent-hint
-                required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field label="Email" required></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field label="Password" type="password" required></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6>
-              <v-select
-                label="Age"
-                required
-                :items="['0-17', '18-29', '30-54', '54+']"
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm6>
-              <v-select
-                label="Interests"
-                multiple
-                autocomplete
-                chips
-                :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-              ></v-select>
-            </v-flex>
-          </v-layout>
-        </v-container>
-        <small>*indicates required field</small>
-      </v-card-text>
-      <v-card-actions>
-        <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" flat @click.native="dialog = false">Close</v-btn>
-        <v-btn color="blue darken-1" flat @click.native="dialog = false">Save</v-btn>
-      </v-card-actions>
-    </v-card>
+  <v-layout row justify-center>
+    <v-dialog v-model="dialog" max-width="350px" transition="scale-transition" origin="center center">
+      <!-- <v-container grid-list-md>
+        <v-layout wrap>
+          <v-flex xs6>
+            <div style="background-color: white;">
+            <v-container grid-list-md>
+              <v-layout wrap>
+                <v-flex xs12>
+                  <v-text-field
+                    label="E-mail"
+                    v-model="email"
+                    :rules="emailRules"
+                  ></v-text-field>
+                </v-flex>
+
+                <v-flex xs12>
+                  <v-text-field
+                    label="Mot de passe"
+                    v-model="password"
+                  ></v-text-field>
+                </v-flex>
+
+                <v-flex xs8>
+                  <v-checkbox
+                    label="Rester connecter?"
+                    v-model="stayConnected"
+                  ></v-checkbox>
+                </v-flex>
+              </v-layout>
+            </v-container>
+            </div>
+          </v-flex>
+
+          <v-flex xs6>
+            <v-card>
+              <v-card-title>
+                <span class="headline">Connexion</span>
+              </v-card-title>
+              <v-card-text>
+                <v-container grid-list-md>
+                  <v-layout wrap>
+                    <v-flex xs12>
+                      <v-text-field
+                        label="E-mail"
+                        v-model="email"
+                        :rules="emailRules"
+                      ></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs12>
+                      <v-text-field
+                        label="Mot de passe"
+                        v-model="password"
+                      ></v-text-field>
+                    </v-flex>
+
+                    <v-flex xs8>
+                      <v-checkbox
+                        label="Rester connecter?"
+                        v-model="stayConnected"
+                      ></v-checkbox>
+                    </v-flex>
+                  </v-layout>
+                </v-container>
+              </v-card-text>
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="blue darken-1" @click.native="LogUser">Se connecter</v-btn>
+              </v-card-actions>
+
+            </v-card>
+          </v-flex>
+        </v-layout>
+      <!-- </v-container> --> -->
+
+      <v-card>
+        <v-card-title>
+          <span class="headline">Connexion</span>
+        </v-card-title>
+        <v-card-text>
+          <v-container grid-list-md>
+            <v-layout wrap>
+              <v-flex xs12>
+                <v-text-field
+                  label="E-mail"
+                  v-model="email"
+                  :rules="emailRules"
+                ></v-text-field>
+              </v-flex>
+
+              <v-flex xs12>
+                <v-text-field
+                  label="Mot de passe"
+                  v-model="password"
+                ></v-text-field>
+              </v-flex>
+
+              <v-flex xs8>
+                <v-checkbox
+                  label="Rester connecter?"
+                  v-model="stayConnected"
+                ></v-checkbox>
+              </v-flex>
+            </v-layout>
+          </v-container>
+        </v-card-text>
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn color="blue darken-1" flat @click.native="openRegister">S'inscrire ?</v-btn>
+          <v-btn color="blue darken-1" @click.native="LogUser">Se connecter</v-btn>
+        </v-card-actions>
+
+      </v-card>
     </v-dialog>
+  </v-layout>
 </template>
 
 <script>
+import { openSpecificModal } from '~/helpers/eventBus'
+
 export default {
+  name: 'login',
+  data: () => ({
+    dialog: false,
+    email: '',
+    password: '',
+    stayConnected: true,
+    emailRules: [
+      (v) => !!v || 'l\'email est requis',
+      (v) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'L\'email doit être valide'
+    ]
+  }),
+  methods: {
+    logUser () {
+      this.dialog = false
+    },
+    openRegister () {
+      openSpecificModal('openRegister')
+    }
+  },
+  mounted () {
+    this.$eventBus.$on('Modals::openLogin', () => {
+      this.dialog = true
+    })
+
+    this.$eventBus.$on('Modals::close', () => {
+      this.dialog = false
+
+      console.log('close modals')
+    })
+  }
 }
 </script>
 
-<style lang="css">
+<style lang="css" scoped>
+
 </style>
