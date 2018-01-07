@@ -3,6 +3,8 @@ import Vuetify from 'vuetify'
 import * as VueGoogleMaps from '~/node_modules/vue2-google-maps/src/main'
 import EventBus from '~/helpers/eventBus'
 import Toasted from 'vue-toasted'
+import Kuzzle from 'kuzzle-sdk'
+import bluebird from 'bluebird'
 
 // Plugin executed only at the beginning.
 // Equals main.js
@@ -41,6 +43,13 @@ window.onNuxtReady(() => {
 
   // Init the eventBus
   Vue.prototype.$eventBus = EventBus
+
+  // Init the kuzzle websocket
+  Kuzzle.prototype.bluebird = bluebird
+  const kuzzle = new Kuzzle(process.env.KUZZLE_HOST)
+
+  // Inject Kuzzle in Vue prototype
+  Vue.prototype.$kuzzle = kuzzle
 
   console.log('Done initializing')
 })

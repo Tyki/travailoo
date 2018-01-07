@@ -69,7 +69,7 @@ export default {
     ],
     passwordRules: [
       (v) => !!v || 'Le mot de passe est requis',
-      (v) => v.length < 8 || 'Votre mot de passe ne contient pas au moins 8 caractères'
+      (v) => v.length > 8 || 'Votre mot de passe ne contient pas au moins 8 caractères'
     ]
   }),
   methods: {
@@ -87,7 +87,29 @@ export default {
 
           return
         }
-        console.log('done')
+
+        const email = this.email.toLowerCase()
+
+        // Creating the user in the backend
+        this.$kuzzle.security.createUserPromise(email, {
+          content: {
+            profileIds: ['default'],
+            firstname: this.firstname,
+            lastname: this.lastname
+          },
+          credentials: {
+            'local': {
+              'username': email,
+              'password': this.password
+            }
+          }
+        }, {refresh: 'wait_for'})
+          .then(response => {
+            console.log(response)
+            console.log('done')
+          }).catch(error => {
+            console.error(error)
+          })
       }
     }
   },

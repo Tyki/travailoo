@@ -13,7 +13,9 @@
     "precommit": "npm run lint"
   },
   "dependencies": {
+    "kuzzle-sdk": "^5.0.10",
     "nuxt": "^1.0.0-rc11",
+    "uuid": "^3.1.0",
     "vue-i18n": "^7.3.4",
     "vue-toasted": "^1.1.24",
     "vue2-google-maps": "^0.8.4",

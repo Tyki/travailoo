@@ -38,7 +38,8 @@ module.exports = {
     }
   },
   env: {
-    API_KEY: 'AIzaSyAZmYQHF1GKPrjwhlrL_4eIzDAP3deWetE'
+    API_KEY: 'AIzaSyAZmYQHF1GKPrjwhlrL_4eIzDAP3deWetE',
+    KUZZLE_HOST: 'localhost'
   },
   /*
   ** Plugins
