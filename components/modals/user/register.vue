@@ -80,7 +80,7 @@ export default {
       if (this.$refs.form.validate()) {
         if (this.password !== this.second_password) {
           this.$toasted.global.toastError({
-            message: 'Les mots de passe ne correspondent pas'
+            message: this.$t('rules.email_not_same')
           })
 
           this.$refs.password.focus()
@@ -105,10 +105,22 @@ export default {
           }
         }, {refresh: 'wait_for'})
           .then(response => {
-            console.log(response)
-            console.log('done')
+            this.$toasted.global.toastSuccess({
+              message: this.$t('success.account_created')
+            })
+
+            // TODO : connect the user?
+            // TODO : reset v-models
+            this.$eventBus.$emit('Modals::close')
           }).catch(error => {
-            console.error(error)
+            if (error.status === 412) {
+              // Email already exists!
+              this.$toasted.global.toastError({
+                message: this.$t('errors.email_already_exists')
+              })
+            } else {
+
+            }
           })
       }
     }

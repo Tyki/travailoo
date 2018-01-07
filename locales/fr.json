@@ -20,6 +20,13 @@
   },
   "rules": {
     "email_required": "L'email est requis",
-    "email_not_valid": "L'email doit être valide"
+    "email_not_valid": "L'email doit être valide",
+    "email_not_same": "Les mots de passes ne correspondent pas"
+  },
+  "errors": {
+    "email_already_exists": "Cet email existe déjà"
+  },
+  "success": {
+    "account_created": "Votre compte à bien été crée!"
   }
 }

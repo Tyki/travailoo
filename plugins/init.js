@@ -15,12 +15,6 @@ window.onNuxtReady(() => {
 
   // Setup Toast and global error toast
   Vue.use(Toasted)
-  const toastOptions = {
-    type: 'error',
-    icon: 'error_outline',
-    duration: 3000,
-    position: 'top-right'
-  }
   Vue.toasted.register('toastError',
     (payload) => {
       if (!payload.message) {
@@ -28,7 +22,25 @@ window.onNuxtReady(() => {
       }
 
       return payload.message
-    }, toastOptions)
+    }, {
+      type: 'error',
+      icon: 'error_outline',
+      duration: 3000,
+      position: 'top-right'
+    })
+
+  Vue.toasted.register('toastSuccess',
+    (payload) => {
+      if (!payload.message) {
+        return 'Success!'
+      }
+      return payload.message
+    }, {
+      type: 'success',
+      icon: 'done',
+      duration: 3000,
+      position: 'top-right'
+    })
 
   Vue.use(VueGoogleMaps, {
     load: {
