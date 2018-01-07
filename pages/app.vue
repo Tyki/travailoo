@@ -1,27 +1,29 @@
 <template lang="html">
-  <v-app>
-    <v-content>
-      <navbar/>
-        <gmap-map
-          :center="{lat:10, lng:10}"
-          :zoom="7"
-          map-type-id="terrain"
-          style="width: 100vw; height: 93.7vh"
-        >
+  <v-app dark id="inspire">
+    <!-- Navbar and user left menu -->
+    <user-drawer-wrapper />
+    <navbar />
 
-        </gmap-map>
-    </v-content>
+    <!-- Map with jobs -->
+    <map-wrapper />
+
+    <!-- Right panel to show jobs -->
+    <job-drawer-wrapper />
   </v-app>
-
-
 </template>
 
 <script>
-import navbar from '@/components/layout/navbar'
+import navbar from '~/components/layout/navbar'
+import mapWrapper from '~/components/layout/mapWrapper'
+import jobDrawerWrapper from '~/components/layout/job/jobDrawerWrapper'
+import userDrawerWrapper from '~/components/layout/user/userDrawerWrapper'
 
 export default {
   components: {
-    navbar
+    navbar,
+    mapWrapper,
+    jobDrawerWrapper,
+    userDrawerWrapper
   }
 }
 </script>

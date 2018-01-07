@@ -1,12 +1,12 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
 import * as VueGoogleMaps from '~/node_modules/vue2-google-maps/src/main'
+import EventBus from '~/helpers/eventBus'
 
 // Plugin executed only at the beginning.
 // Equals main.js
 
 window.onNuxtReady(() => {
-  // TODO : to be changed to specific needed components
   Vue.use(Vuetify)
 
   Vue.use(VueGoogleMaps, {
@@ -19,6 +19,9 @@ window.onNuxtReady(() => {
       // (as you require)
     }
   })
+
+  // Init the eventBus
+  Vue.prototype.$eventBus = EventBus
 
   console.log('Done initializing')
 })
