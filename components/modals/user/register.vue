@@ -2,64 +2,95 @@
   <v-dialog v-model="dialog" max-width="500px">
     <v-card>
       <v-card-title>
-        <span class="headline">User Profile</span>
+        <span class="headline">{{ $t('modals.register.title') }}</span>
       </v-card-title>
       <v-card-text>
-        <v-container grid-list-md>
-          <v-layout wrap>
-            <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal first name" required></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal middle name" hint="example of helper text only on focus"></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6 md4>
-              <v-text-field label="Legal last name" hint="example of persistent helper text"
-                persistent-hint
-                required
-              ></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field label="Email" required></v-text-field>
-            </v-flex>
-            <v-flex xs12>
-              <v-text-field label="Password" type="password" required></v-text-field>
-            </v-flex>
-            <v-flex xs12 sm6>
-              <v-select
-                label="Age"
-                required
-                :items="['0-17', '18-29', '30-54', '54+']"
-              ></v-select>
-            </v-flex>
-            <v-flex xs12 sm6>
-              <v-select
-                label="Interests"
-                multiple
-                autocomplete
-                chips
-                :items="['Skiing', 'Ice hockey', 'Soccer', 'Basketball', 'Hockey', 'Reading', 'Writing', 'Coding', 'Basejump']"
-              ></v-select>
-            </v-flex>
-          </v-layout>
-        </v-container>
-        <small>*indicates required field</small>
+        <v-form v-model="valid" ref="form" lazy-validation>
+          <v-container grid-list-md>
+            <v-layout wrap>
+                <!-- Firstname -->
+                <v-flex xs12>
+                  <v-text-field :label="$t('modals.register.firstname_label')" v-model="firstname" :rules="firstnameRules" required/>
+                </v-flex>
+
+                <!-- Lastname -->
+                <v-flex xs12>
+                  <v-text-field :label="$t('modals.register.lastname_label')" v-model="lastname" :rules="lastnameRules" required/>
+                </v-flex>
+
+                <!-- Email -->
+                <v-flex xs12>
+                  <v-text-field :label="$t('modals.login.email_label')" v-model="email" :rules="emailRules" required/>
+                </v-flex>
+
+                <!-- Password -->
+                <v-flex xs6>
+                  <v-text-field :label="$t('modals.login.password_label')" ref="password" v-model="password" type="password" :rules="passwordRules" persistent-hint :hint="$t('modals.register.password_hint')" required/>
+                </v-flex>
+                <v-flex xs6>
+                  <v-text-field :label="$t('modals.register.repeat_password_label')" v-model="second_password" type="password" required :rules="passwordRules"/>
+                </v-flex>
+            </v-layout>
+          </v-container>
+        </v-form>
       </v-card-text>
       <v-card-actions>
         <v-spacer></v-spacer>
-        <v-btn color="blue darken-1" flat @click.native="dialog = false">Close</v-btn>
-        <v-btn color="blue darken-1" flat @click.native="dialog = false">Save</v-btn>
+        <v-btn color="blue darken-1" flat @click.native="openLogin">{{ $t('modals.register.already_have_account') }}</v-btn>
+        <v-btn color="blue darken-1" @click.native="registerUser">{{ $t('modals.register.register') }}</v-btn>
       </v-card-actions>
     </v-card>
   </v-dialog>
 </template>
 
 <script>
+import { openSpecificModal } from '~/helpers/eventBus'
+
 export default {
   name: 'register',
   data: () => ({
-    dialog: false
+    dialog: false,
+    valid: false,
+    firstname: '',
+    lastname: '',
+    email: '',
+    password: '',
+    second_password: '',
+    // TODO:  Find a way to inject translated rules
+    emailRules: [
+      (v) => !!v || 'l\'email est requis',
+      (v) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'L\'email doit être valide'
+    ],
+    firstnameRules: [
+      (v) => !!v || 'Le prénom est requis'
+    ],
+    lastnameRules: [
+      (v) => !!v || 'Le nom est requis'
+    ],
+    passwordRules: [
+      (v) => !!v || 'Le mot de passe est requis',
+      (v) => v.length < 8 || 'Votre mot de passe ne contient pas au moins 8 caractères'
+    ]
   }),
+  methods: {
+    openLogin () {
+      openSpecificModal('openLogin')
+    },
+    registerUser () {
+      if (this.$refs.form.validate()) {
+        if (this.password !== this.second_password) {
+          this.$toasted.global.toastError({
+            message: 'Les mots de passe ne correspondent pas'
+          })
+
+          this.$refs.password.focus()
+
+          return
+        }
+        console.log('done')
+      }
+    }
+  },
   mounted () {
     this.$eventBus.$on('Modals::openRegister', () => {
       this.dialog = true

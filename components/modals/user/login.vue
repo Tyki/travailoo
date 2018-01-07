@@ -77,14 +77,14 @@
 
       <v-card>
         <v-card-title>
-          <span class="headline">Connexion</span>
+          <span class="headline">{{ $t('modals.login.title') }}</span>
         </v-card-title>
         <v-card-text>
           <v-container grid-list-md>
             <v-layout wrap>
               <v-flex xs12>
                 <v-text-field
-                  label="E-mail"
+                  :label="$t('modals.login.email_label')"
                   v-model="email"
                   :rules="emailRules"
                 ></v-text-field>
@@ -92,14 +92,14 @@
 
               <v-flex xs12>
                 <v-text-field
-                  label="Mot de passe"
+                  :label="$t('modals.login.password_label')"
                   v-model="password"
                 ></v-text-field>
               </v-flex>
 
               <v-flex xs8>
                 <v-checkbox
-                  label="Rester connecter?"
+                  :label="$t('modals.login.stay_connnected_label')"
                   v-model="stayConnected"
                 ></v-checkbox>
               </v-flex>
@@ -108,8 +108,8 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="blue darken-1" flat @click.native="openRegister">S'inscrire ?</v-btn>
-          <v-btn color="blue darken-1" @click.native="LogUser">Se connecter</v-btn>
+          <v-btn color="blue darken-1" flat @click.native="openRegister">{{ $t('modals.login.register') }}</v-btn>
+          <v-btn color="blue darken-1" @click.native="LogUser">{{ $t('modals.login.connect') }}</v-btn>
         </v-card-actions>
 
       </v-card>
@@ -127,8 +127,9 @@ export default {
     email: '',
     password: '',
     stayConnected: true,
+    // TODO:  Find a way to inject translated rules
     emailRules: [
-      (v) => !!v || 'l\'email est requis',
+      (v) => !!v || 'L\'email est requis',
       (v) => /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/.test(v) || 'L\'email doit être valide'
     ]
   }),

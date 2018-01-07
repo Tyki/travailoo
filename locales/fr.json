@@ -1,0 +1,25 @@
+{
+  "modals": {
+    "login": {
+      "title": "Connexion",
+      "email_label": "E-mail",
+      "password_label": "Mot de passe",
+      "stay_connnected_label": "Rester connecté?",
+      "register": "S'inscrire?",
+      "connect": "Se connecter"
+    },
+    "register": {
+      "title": "Inscrivez-vous",
+      "firstname_label": "Prénom",
+      "lastname_label": "Nom",
+      "repeat_password_label": "Répétez votre mot de passe",
+      "password_hint": "(8 caractères minimum)",
+      "already_have_account": "J'ai déjà un compte",
+      "register": "S'inscrire"
+    }
+  },
+  "rules": {
+    "email_required": "L'email est requis",
+    "email_not_valid": "L'email doit être valide"
+  }
+}

@@ -44,6 +44,7 @@ module.exports = {
   ** Plugins
   */
   plugins: [
-    {ssr: false, src: '~plugins/init'}
+    {ssr: false, src: '~plugins/init'},
+    '~/plugins/i18n.js'
   ]
 }
