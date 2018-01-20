@@ -77,13 +77,13 @@ export default {
           }
 
           // Store loggedStatus
-          this.$store.commit('changeLoggedStatus', true)
+          this.$store.commit('user/changeLoggedStatus', true)
 
           return this.$kuzzle.whoAmIPromise()
         })
         .then((user) => {
           if (user.hasOwnProperty('content') && user.content.hasOwnProperty('firstname')) {
-            this.$store.commit('updateUserFirstname', user.content.firstname)
+            this.$store.commit('user/updateUserFirstname', user.content.firstname)
           }
 
           this.$toasted.global.toastSuccess({

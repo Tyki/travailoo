@@ -15,55 +15,19 @@
         </v-list-tile-content>
       </v-list-tile>
 
-      <!-- <v-divider />
-      <v-divider /> -->
+      <v-divider />
 
-      <!-- Menu actions : copy paste-->
-      <!-- <template v-for="(item, i) in items">
-        <v-list-group v-if="item.children" v-model="item.model" no-action>
-            <v-list-tile slot="item" @click="">
+      <v-list-tile @click="addJob" v-if="isUserLogged">
+        <v-list-tile-action>
+          <v-icon>add</v-icon>
+        </v-list-tile-action>
+        <v-list-tile-content>
+          <v-list-tile-title>
+            Déposer une annonce
+          </v-list-tile-title>
+        </v-list-tile-content>
+      </v-list-tile>
 
-              <v-list-tile-action>
-                <v-icon>{{ item.model ? item.icon : item['icon-alt'] }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>
-                  {{ item.text }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-            <v-list-tile
-              v-for="(child, i) in item.children"
-              :key="i"
-              @click=""
-            >
-              <v-list-tile-action v-if="child.icon">
-                <v-icon>{{ child.icon }}</v-icon>
-              </v-list-tile-action>
-              <v-list-tile-content>
-                <v-list-tile-title>
-                  {{ child.text }}
-                </v-list-tile-title>
-              </v-list-tile-content>
-            </v-list-tile>
-        </v-list-group>
-
-        <div v-else>
-        <v-divider v-if="item.dividerTop"></v-divider>
-        <v-list-tile @click="item.function">
-          <v-list-tile-action>
-            <v-icon>{{ item.icon }}</v-icon>
-          </v-list-tile-action>
-          <v-list-tile-content>
-            <v-list-tile-title>
-              {{ item.text }}
-            </v-list-tile-title>
-          </v-list-tile-content>
-        </v-list-tile>
-        <v-divider v-if="item.dividerBot"></v-divider>
-      </div>
-
-      </template> -->
     </v-list>
   </v-navigation-drawer>
 </template>
@@ -97,16 +61,25 @@ export default {
   }),
   computed: {
     isUserLogged () {
-      return this.$store.state.isUserLogged
+      return this.$store.state.user.isUserLogged
     }
   },
   methods: {
     logoutUser () {
-      this.$kuzzle.logoutPromise()
-        .then(() => {
-          this.$store.commit('changeLoggedStatus', false)
-          this.$store.commit('updateUserFirstname', '')
-        })
+      this.$kuzzle.logout((error, response) => {
+        if (error) {
+          console.error(error)
+        }
+        this.$store.commit('user/changeLoggedStatus', false)
+        this.$store.commit('user/updateUserFirstname', '')
+      })
+    },
+
+    addJob () {
+      // Close the drawer
+      this.drawer = !this.drawer
+      // Open the first modal
+      this.$eventBus.$emit('Modals::JobStep1')
     }
   },
   mounted () {

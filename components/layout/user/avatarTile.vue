@@ -32,10 +32,10 @@ export default {
   name: 'avatarTile',
   computed: {
     isUserLogged () {
-      return this.$store.state.isUserLogged
+      return this.$store.state.user.isUserLogged
     },
     userInformations () {
-      return this.$store.state.userInformations
+      return this.$store.state.user.userInformations
     }
   },
   methods: {

@@ -1,24 +1,9 @@
-import Vuex from 'vuex'
+export const state = () => ({
+  counter: 0
+})
 
-const createStore = () => {
-  return new Vuex.Store({
-    state: {
-      isUserLogged: false,
-      userInformations: {
-        firstname: ''
-      },
-      // TODO
-      userPreferences: {}
-    },
-    mutations: {
-      changeLoggedStatus (state, isUserLogged) {
-        state.isUserLogged = isUserLogged
-      },
-      updateUserFirstname (state, firstname) {
-        state.userInformations.firstname = firstname
-      }
-    }
-  })
+export const mutations = {
+  increment (state) {
+    state.counter++
+  }
 }
-
-export default createStore
