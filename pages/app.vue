@@ -32,7 +32,7 @@ export default {
     modalWrapper
   },
   methods: {
-    fetchData () {
+    fetchJobsData () {
       let options = {
         size: 1000
       }
@@ -53,42 +53,44 @@ export default {
         this.$store.commit('jobs/addToCategories', result.getDocuments())
 
         // Mid Categories
-        // this.$kuzzle.collection('midCategories', 'labels').search(body, options, (error, result) => {
-        //   if (error) {
-        //     console.log(error)
-        //   }
-        //   this.midCategories = result.getDocuments()
-        //
-        //   // Sub Categories
-        //   this.$kuzzle.collection('subCategories', 'labels').search(body, options, (error, result) => {
-        //     if (error) {
-        //       console.log(error)
-        //     }
-        //     this.subCategories = result.getDocuments()
-        //
-        //     this.fetchJobs()
-        //   })
-        // })
+        this.$kuzzle.collection('midCategories', 'labels').search(body, options, (error, result) => {
+          if (error) {
+            console.log(error)
+          }
+          this.$store.commit('jobs/addToMidCategories', result.getDocuments())
+
+          // Sub Categories
+          this.$kuzzle.collection('subCategories', 'labels').search(body, options, (error, result) => {
+            if (error) {
+              console.log(error)
+            }
+            this.$store.commit('jobs/addToSubCategories', result.getDocuments())
+
+            // Desactivate this line to store all available jobs inside vuex
+            // It crash the vue-devtools
+            // this.fetchJobs({})
+          })
+        })
       })
     },
 
-    fetchJobs () {
+    fetchJobs (accumulator) {
       this.$kuzzle.collection('jobs', 'labels').search({query: {match_all: {}}}, {size: 1000, scroll: '1s'}, (error, result) => {
         if (error) {
           console.log(error)
         }
 
         result.getDocuments().forEach(document => {
-          this.jobs.push(document)
+          accumulator[document.id] = document
         })
 
         if (result.options.scrollId) {
-          this.scrollFetchJobs(result.options.scrollId)
+          this.scrollFetchJobs(result.options.scrollId, accumulator)
         }
       })
     },
 
-    scrollFetchJobs (scrollId) {
+    scrollFetchJobs (scrollId, accumulator) {
       if (scrollId) {
         this.$kuzzle.collection('jobs', 'labels').scroll(scrollId, {scroll: '1s'}, (error, result) => {
           if (error) {
@@ -96,11 +98,14 @@ export default {
           }
 
           result.getDocuments().forEach(document => {
-            this.jobs.push(document)
+            accumulator[document.id] = document
           })
 
           if (result.getDocuments().length !== 0 && result.options.scrollId) {
-            this.scrollFetchJobs(result.options.scrollId)
+            this.scrollFetchJobs(result.options.scrollId, accumulator)
+          } else {
+            // Done with scroll, push into vuex
+            this.$store.commit('jobs/addToJobsList', accumulator)
           }
         })
       }
@@ -134,7 +139,7 @@ export default {
     }
 
     // Fetch data
-    this.fetchData()
+    this.fetchJobsData()
   }
 }
 </script>

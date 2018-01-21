@@ -72,6 +72,8 @@ export default {
         }
         this.$store.commit('user/changeLoggedStatus', false)
         this.$store.commit('user/updateUserFirstname', '')
+
+        this.drawer = !this.drawer
       })
     },
 
