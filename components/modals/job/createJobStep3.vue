@@ -219,7 +219,6 @@ export default {
   }),
   methods: {
     validate () {
-
     },
     cancel () {
       // Close the form

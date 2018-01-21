@@ -40,7 +40,7 @@
                         autocomplete
                         v-bind:items="midCategories"
                         v-model="chosenMidCategory"
-                        label="Select"
+                        label="Sélectionnez une sous-catégorie"
                         single-line
                         bottom
                         item-text="name"
@@ -52,7 +52,7 @@
                         autocomplete
                         v-bind:items="subCategories"
                         v-model="chosenSubCategory"
-                        label="Select"
+                        label="Affinez la recherche..."
                         single-line
                         bottom
                         item-text="name"
@@ -169,9 +169,8 @@ export default {
         return
       }
 
-      this.searchInterval = setInterval(() => {
-        clearInterval(this.searchInterval)
-        console.log('searching for ' + searchTerm)
+      clearTimeout(this.searchInterval)
+      this.searchInterval = setTimeout(() => {
         this.loading = true
 
         this.searchedJobs = []
@@ -184,7 +183,7 @@ export default {
           })
         })
         this.loading = false
-      }, 300)
+      }, 1000)
     },
     checkSubSelect (toCheck) {
       if (toCheck === 'midCategory') {

@@ -114,11 +114,6 @@ function insertData () {
   kuzzle.loginPromise('local', {username: 'admin', password: 'admin'}, '1h')
     .then(() => kuzzle.createIndexPromise('offers'))
     .then(() => kuzzle.collection('data', 'offers').createPromise())
-    .then(() => kuzzle.collection('data', 'offers').collectionMapping({
-      position: {
-        type: 'geo_point'
-      }
-    })).applyPromise()
     .then(() => kuzzle.createIndexPromise('labels'))
     .then(() => kuzzle.collection('categories', 'labels').createPromise())
     .then(() => kuzzle.collection('midCategories', 'labels').createPromise())
