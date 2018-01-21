@@ -5,6 +5,7 @@ import EventBus from '~/helpers/eventBus'
 import Toasted from 'vue-toasted'
 import Kuzzle from 'kuzzle-sdk'
 import bluebird from 'bluebird'
+import wysiwyg from 'vue-wysiwyg'
 
 // Plugin executed only at the beginning.
 // Equals main.js
@@ -12,6 +13,12 @@ import bluebird from 'bluebird'
 window.onNuxtReady(() => {
   // Front Lib
   Vue.use(Vuetify)
+  Vue.use(wysiwyg, {
+    hideMOdules: {
+      'image': true,
+      'removeFormat': true
+    }
+  })
 
   // Setup Toast and global error toast
   Vue.use(Toasted)

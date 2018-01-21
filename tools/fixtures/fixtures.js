@@ -112,16 +112,18 @@ function createFixtures () {
 
 function insertData () {
   kuzzle.loginPromise('local', {username: 'admin', password: 'admin'}, '1h')
+    .then(() => kuzzle.createIndexPromise('offers'))
+    .then(() => kuzzle.collection('data', 'offers').createPromise())
+    .then(() => kuzzle.collection('data', 'offers').collectionMapping({
+      position: {
+        type: 'geo_point'
+      }
+    })).applyPromise()
     .then(() => kuzzle.createIndexPromise('labels'))
-    .catch((e) => console.error(e))
     .then(() => kuzzle.collection('categories', 'labels').createPromise())
-    .catch((e) => console.error(e))
     .then(() => kuzzle.collection('midCategories', 'labels').createPromise())
-    .catch((e) => console.error(e))
     .then(() => kuzzle.collection('subCategories', 'labels').createPromise())
-    .catch((e) => console.error(e))
     .then(() => kuzzle.collection('jobs', 'labels').createPromise())
-    .catch((e) => console.error(e))
     .then(() => kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: data}}))
     .then(response => {
       console.log('done !')

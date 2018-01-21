@@ -5,11 +5,11 @@
         <v-layout column wrap align-center>
           <v-spacer />
           <!-- Title -->
-          <v-flex xs12 sm4 class="my-3">
+          <v-flex xs12 sm4 class="my-5">
             <div class="text-xs-center">
               <h2 class="headline">Créer une annonce</h2>
               <span class="subheading">
-                La description de la premiere partie du formulaire !
+                Sélectionnez le type d'annonce que vous voulez soumettre
               </span>
             </div>
           </v-flex>
@@ -89,7 +89,7 @@
                         :loading="loading"
                         :items="searchedJobs"
                         :search-input.sync="search"
-                        v-model="selectedJob"
+                        v-model="chosenJob"
                         item-text="name"
                         item-value="category"
                         return-object
@@ -128,7 +128,6 @@ export default {
     chosenSubCategory: '',
     chosenJob: '',
     // Right column
-    selectedJob: '',
     loading: false,
     search: null,
     jobs: [],
@@ -264,6 +263,19 @@ export default {
       this.loading = false
       this.search = null
       this.searchedJobs = []
+    },
+    next () {
+      if (this.chosenJob === '') {
+        this.$toasted.global.toastError({
+          message: 'Merci de choisir un intitulé pour cette nouvelle annonce'
+        })
+        return
+      }
+
+      // Close current form
+      this.showForm = false
+
+      this.$eventBus.$emit('Jobs::CreateStep3', {jobCode: this.chosenJob.code, jobPosition: this.newJobPosition})
     }
   },
   mounted () {
