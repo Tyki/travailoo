@@ -4,7 +4,7 @@
     <v-card color="grey lighten-4" v-if="snackbar">
       <v-snackbar
           :timeout="timeout"
-          :color="'info'"
+          :color="'dark'"
           :multi-line="false"
           :vertical="true"
           v-model="snackbar"
@@ -18,7 +18,7 @@
     </v-card>
 
     <!-- Step 2. Fill the form to submit the new job -->
-    <createJobStep2 v-if="showStep2" v-bind:newJobPosition="newJobPosition"/>
+    <createJobStep2 v-bind:newJobPosition="newJobPosition"/>
   </v-layout>
 </template>
 
@@ -52,17 +52,24 @@ export default {
 
     validate () {
       this.snackbar = false
-      this.showStep2 = true
+      this.$eventBus.$emit('Jobs::CreateStep2')
     }
   },
   mounted () {
-    this.$eventBus.$on('Modals::JobStep1', () => {
+    this.$eventBus.$on('Jobs::StartCreate', () => {
       // Reset the component
       this.showValidate = false
       this.showStep2 = false
       // Step 1
       this.snackbar = true
       this.$store.commit('map/switchToMapModeCreate')
+    })
+
+    this.$eventBus.$on('Jobs::CancelCreate', () => {
+      this.newJobPosition = {
+        lat: '',
+        lng: ''
+      }
     })
 
     // Click on the map to fetch the exact GPS position of the new job

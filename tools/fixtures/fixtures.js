@@ -18,6 +18,7 @@ function createFixtures () {
     // Use the writable stream api
     parser.on('readable', function () {
       let record
+      /* eslint-disable no-cond-assign */
       while (record = parser.read()) {
         output.push(record)
       }
@@ -90,7 +91,8 @@ function createFixtures () {
             midCategory,
             subCategory,
             code,
-            name
+            name,
+            fullIdentifier: category + '-' + midCategory + '-' + subCategory
           })
         }
       })
@@ -110,24 +112,24 @@ function createFixtures () {
 
 function insertData () {
   kuzzle.loginPromise('local', {username: 'admin', password: 'admin'}, '1h')
-  .then(() => kuzzle.createIndexPromise('labels'))
-  .catch((e) => console.error(e))
-  .then(() => kuzzle.collection('categories', 'labels').createPromise())
-  .catch((e) => console.error(e))
-  .then(() => kuzzle.collection('midCategories', 'labels').createPromise())
-  .catch((e) => console.error(e))
-  .then(() => kuzzle.collection('subCategories', 'labels').createPromise())
-  .catch((e) => console.error(e))
-  .then(() => kuzzle.collection('jobs', 'labels').createPromise())
-  .catch((e) => console.error(e))
-  .then(() => kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: data}}))
-  .then(response => {
-    console.log('done !')
-    process.exit(0)
-  }).catch(error => {
-    console.error(error)
-    process.exit(1)
-  })
+    .then(() => kuzzle.createIndexPromise('labels'))
+    .catch((e) => console.error(e))
+    .then(() => kuzzle.collection('categories', 'labels').createPromise())
+    .catch((e) => console.error(e))
+    .then(() => kuzzle.collection('midCategories', 'labels').createPromise())
+    .catch((e) => console.error(e))
+    .then(() => kuzzle.collection('subCategories', 'labels').createPromise())
+    .catch((e) => console.error(e))
+    .then(() => kuzzle.collection('jobs', 'labels').createPromise())
+    .catch((e) => console.error(e))
+    .then(() => kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: data}}))
+    .then(response => {
+      console.log('done !')
+      process.exit(0)
+    }).catch(error => {
+      console.error(error)
+      process.exit(1)
+    })
 }
 
 createFixtures()

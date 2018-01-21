@@ -1,6 +1,6 @@
 <template lang="html">
   <v-layout row justify-center>
-    <v-dialog v-model="dialog" max-width="350px" transition="scale-transition" origin="center center">
+    <v-dialog v-model="dialog" max-width="425px" transition="scale-transition" origin="center center">
       <v-card>
         <v-card-title>
           <span class="headline">{{ $t('modals.login.title') }}</span>

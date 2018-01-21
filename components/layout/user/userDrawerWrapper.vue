@@ -81,7 +81,7 @@ export default {
       // Close the drawer
       this.drawer = !this.drawer
       // Open the first modal
-      this.$eventBus.$emit('Modals::JobStep1')
+      this.$eventBus.$emit('Jobs::StartCreate')
     }
   },
   mounted () {

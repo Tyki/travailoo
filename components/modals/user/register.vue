@@ -1,5 +1,5 @@
 <template lang="html">
-  <v-dialog v-model="dialog" max-width="500px">
+  <v-dialog v-model="dialog" max-width="700px">
     <v-card>
       <v-card-title>
         <span class="headline">{{ $t('modals.register.title') }}</span>

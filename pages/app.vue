@@ -72,43 +72,6 @@ export default {
           })
         })
       })
-    },
-
-    fetchJobs (accumulator) {
-      this.$kuzzle.collection('jobs', 'labels').search({query: {match_all: {}}}, {size: 1000, scroll: '1s'}, (error, result) => {
-        if (error) {
-          console.log(error)
-        }
-
-        result.getDocuments().forEach(document => {
-          accumulator[document.id] = document
-        })
-
-        if (result.options.scrollId) {
-          this.scrollFetchJobs(result.options.scrollId, accumulator)
-        }
-      })
-    },
-
-    scrollFetchJobs (scrollId, accumulator) {
-      if (scrollId) {
-        this.$kuzzle.collection('jobs', 'labels').scroll(scrollId, {scroll: '1s'}, (error, result) => {
-          if (error) {
-            console.log(error)
-          }
-
-          result.getDocuments().forEach(document => {
-            accumulator[document.id] = document
-          })
-
-          if (result.getDocuments().length !== 0 && result.options.scrollId) {
-            this.scrollFetchJobs(result.options.scrollId, accumulator)
-          } else {
-            // Done with scroll, push into vuex
-            this.$store.commit('jobs/addToJobsList', accumulator)
-          }
-        })
-      }
     }
   },
   created () {
