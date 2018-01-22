@@ -119,7 +119,7 @@ function createOffersFixtures (callback) {
   offers = []
   var count = 1
 
-  for (var i = 0; i < 1000; i++) {
+  for (var i = 0; i < 10000; i++) {
     /**
      Ref GPS POINT
     'lat': 43.62613531177415,
@@ -143,20 +143,20 @@ function createOffersFixtures (callback) {
     var lat
     var lon
     if (count === 1) {
-      lat = 43.62613531177415 + randomFloat(1)
-      lon = 3.9056396484375 + randomFloat(1)
+      lat = 43.62613531177415 + randomFloat(2)
+      lon = 3.9056396484375 + randomFloat(2)
       count++
     } else if (count === 2) {
-      lat = 43.62613531177415 - randomFloat(1)
-      lon = 3.9056396484375 - randomFloat(1)
+      lat = 43.62613531177415 - randomFloat(2)
+      lon = 3.9056396484375 - randomFloat(2)
       count++
     } else if (count === 3) {
-      lat = 43.62613531177415 - randomFloat(1)
-      lon = 3.9056396484375 + randomFloat(1)
+      lat = 43.62613531177415 - randomFloat(2)
+      lon = 3.9056396484375 + randomFloat(2)
       count++
     } else if (count === 4) {
-      lat = 43.62613531177415 + randomFloat(1)
-      lon = 3.9056396484375 - randomFloat(1)
+      lat = 43.62613531177415 + randomFloat(2)
+      lon = 3.9056396484375 - randomFloat(2)
       count++
     } else {
       count = 1
