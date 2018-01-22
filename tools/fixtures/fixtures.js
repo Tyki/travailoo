@@ -112,9 +112,12 @@ function createFixtures () {
 
 function insertData () {
   kuzzle.loginPromise('local', {username: 'admin', password: 'admin'}, '1h')
+    .then(() => kuzzle.queryPromise({index: 'labels'}, {controller: 'index', action: 'delete'}))
+    .then(() => kuzzle.queryPromise({index: 'offers'}, {controller: 'index', action: 'delete'}))
     .then(() => kuzzle.createIndexPromise('offers'))
     .then(() => kuzzle.collection('data', 'offers').createPromise())
     .then(() => kuzzle.createIndexPromise('labels'))
+    .then(() => kuzzle.collection('data', 'offers').collectionMapping({'jobPosition': {type: 'geo_point', index: 'analyzed'}}).applyPromise())
     .then(() => kuzzle.collection('categories', 'labels').createPromise())
     .then(() => kuzzle.collection('midCategories', 'labels').createPromise())
     .then(() => kuzzle.collection('subCategories', 'labels').createPromise())

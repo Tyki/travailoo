@@ -1,6 +1,6 @@
 <template lang="html">
-  <v-layout>
-    <v-dialog v-model="showForm" max-width="1000px" persistent transition="scale-transition" origin="center center">
+  <v-layout class="force-white-background">
+    <v-dialog v-model="showForm" max-width="1000px" persistent transition="scale-transition" origin="center center" class="force-white-background">
       <v-flex xs12 class="force-white-background">
         <v-layout column wrap align-center>
           <v-spacer />
@@ -102,7 +102,7 @@
         </v-layout>
       </v-flex>
 
-      <v-flex xs12 class="force-white-background">
+      <v-flex xs12>
         <v-card>
           <v-card-actions>
             <v-spacer></v-spacer>
@@ -132,14 +132,10 @@ export default {
     search: null,
     jobs: [],
     searchedJobs: [],
-    searchInterval: 3000
+    searchInterval: 3000,
+    categories: []
   }),
   computed: {
-    categories () {
-      return Object.keys(this.$store.state.jobs.categories).map(category => {
-        return {category, name: this.$store.state.jobs.categories[category]}
-      })
-    },
     midCategories () {
       return Object.keys(this.$store.state.jobs.midCategories[this.chosenCategory.category]).map(midCategory => {
         return {midCategory, name: this.$store.state.jobs.midCategories[this.chosenCategory.category][midCategory]}
@@ -245,6 +241,9 @@ export default {
       }
     },
     cancel () {
+      this.resetComponent()
+    },
+    resetComponent () {
       // Close the form
       this.showForm = false
 
@@ -270,9 +269,7 @@ export default {
         })
         return
       }
-
-      // Close current form
-      this.showForm = false
+      this.resetComponent()
 
       this.$eventBus.$emit('Jobs::CreateStep3', {jobCode: this.chosenJob.code, jobPosition: this.newJobPosition})
     }
@@ -284,6 +281,10 @@ export default {
   },
   created () {
     this.fetchJobs({})
+
+    this.categories = Object.keys(this.$store.state.jobs.categories).map(category => {
+      return {category, name: this.$store.state.jobs.categories[category]}
+    })
   },
   watch: {
     search (val) {

@@ -1,8 +1,8 @@
 <template>
-  <v-layout>
-    <v-dialog v-model="showForm" scrollable max-width="1200px" persistent transition="scale-transition" origin="center center">
+  <v-layout class="force-white-background">
+    <v-dialog v-model="showForm" scrollable max-width="1200px" persistent transition="scale-transition" origin="center center" class="force-white-background">
       <v-flex xs12 class="force-white-background">
-        <v-layout column wrap align-center>
+        <v-layout column wrap align-center class="force-white-background">
           <v-spacer />
           <!-- Title -->
           <v-flex xs12 sm4 class="my-5">
@@ -84,6 +84,7 @@
                   <!-- Description -->
                   <v-layout row>
                     <v-flex xs12>
+                      <v-subheader>Description</v-subheader>
                       <wysiwyg v-model="description" />
 
                       <!-- <v-text-field
@@ -186,6 +187,8 @@
 </template>
 
 <script>
+const uuidv4 = require('uuid/v4')
+
 export default {
   name: 'createJobStep3',
   data: () => ({
@@ -219,6 +222,41 @@ export default {
   }),
   methods: {
     validate () {
+      let document = {
+        jobCode: this.jobCode,
+        jobPosition: {
+          lat: this.jobPosition.lat,
+          lon: this.jobPosition.lng
+        },
+        title: this.title,
+        description: this.description,
+        offerType: this.chosenOfferType.key,
+        societyName: this.societyName,
+        societyAddress: this.societyAddress,
+        societyWebsite: this.societyWebsite,
+        experience: this.chosenExperience,
+        salary: this.salary
+      }
+
+      console.log(document)
+
+      return this.$kuzzle.collection('data', 'offers').createDocumentPromise(uuidv4(), document, {refresh: 'wait_for'})
+        .then(result => {
+          this.$toasted.global.toastSuccess({
+            message: 'Votre annonce à été publiée !'
+          })
+
+          // TODO : add to jobs list
+
+          // Shortcut to close the popup
+          this.cancel()
+        })
+        .catch(error => {
+          console.error(error)
+          this.$toasted.global.toastError({
+            message: 'Erreur dans la création de l\'annonce. Merci de réessayer ultérieurement'
+          })
+        })
     },
     cancel () {
       // Close the form
@@ -243,7 +281,6 @@ export default {
   },
   mounted () {
     this.$eventBus.$on('Jobs::CreateStep3', (payload) => {
-      console.log(payload)
       this.jobCode = payload.jobCode
       this.jobPosition = payload.jobPosition
       this.showForm = true
