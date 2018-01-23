@@ -12,10 +12,11 @@ module.exports = {
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' },
-      { rel: 'stylesheet', href: 'https://unpkg.com/vuetify@0.17.6/dist/vuetify.min.css' }
+      { rel: 'stylesheet', href: 'https://unpkg.com/vuetify@0.17.6/dist/vuetify.min.css' },
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' }
     ],
     script: [
-      { src: 'https://maps.googleapis.com/maps/api/js?key=AIzaSyAZmYQHF1GKPrjwhlrL_4eIzDAP3deWetE' }
+      { src: 'https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js' }
     ]
   },
   /*

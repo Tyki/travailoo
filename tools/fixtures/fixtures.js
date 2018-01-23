@@ -210,7 +210,13 @@ function getRandomInt (max) {
 function insertData () {
   kuzzle.loginPromise('local', {username: 'admin', password: 'admin'}, '1h')
     .then(() => kuzzle.queryPromise({index: 'labels'}, {controller: 'index', action: 'delete'}))
+    .catch(error => {
+      console.error(error)
+    })
     .then(() => kuzzle.queryPromise({index: 'offers'}, {controller: 'index', action: 'delete'}))
+    .catch(error => {
+      console.error(error)
+    })
     .then(() => kuzzle.createIndexPromise('offers'))
     .then(() => kuzzle.collection('data', 'offers').createPromise())
     .then(() => kuzzle.createIndexPromise('labels'))
