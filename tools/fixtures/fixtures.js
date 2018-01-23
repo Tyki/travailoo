@@ -115,7 +115,7 @@ function createFixtures () {
   }
 }
 
-function createOffersFixtures (callback) {
+function createOffersFixtures () {
   offers = []
   var count = 1
 
@@ -143,20 +143,20 @@ function createOffersFixtures (callback) {
     var lat
     var lon
     if (count === 1) {
-      lat = 43.62613531177415 + randomFloat(2)
-      lon = 3.9056396484375 + randomFloat(2)
+      lat = 43.62613531177415 + randomFloat(0.02)
+      lon = 3.9056396484375 + randomFloat(0.02)
       count++
     } else if (count === 2) {
-      lat = 43.62613531177415 - randomFloat(2)
-      lon = 3.9056396484375 - randomFloat(2)
+      lat = 43.62613531177415 - randomFloat(0.02)
+      lon = 3.9056396484375 - randomFloat(0.02)
       count++
     } else if (count === 3) {
-      lat = 43.62613531177415 - randomFloat(2)
-      lon = 3.9056396484375 + randomFloat(2)
+      lat = 43.62613531177415 - randomFloat(0.02)
+      lon = 3.9056396484375 + randomFloat(0.02)
       count++
     } else if (count === 4) {
-      lat = 43.62613531177415 + randomFloat(2)
-      lon = 3.9056396484375 - randomFloat(2)
+      lat = 43.62613531177415 + randomFloat(0.02)
+      lon = 3.9056396484375 - randomFloat(0.02)
       count++
     } else {
       count = 1
@@ -200,8 +200,7 @@ function createOffersFixtures (callback) {
     offers.push(document)
   }
 
-  console.log('Done generating offers')
-  callback()
+  return kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: offers}})
 }
 
 function getRandomInt (max) {
@@ -221,7 +220,16 @@ function insertData () {
     .then(() => kuzzle.collection('subCategories', 'labels').createPromise())
     .then(() => kuzzle.collection('jobs', 'labels').createPromise())
     .then(() => kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: data}}))
-    .then(() => kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: offers}}))
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
+    .then(() => createOffersFixtures())
     .then(response => {
       // console.log('done !')
       process.exit(0)
@@ -231,6 +239,4 @@ function insertData () {
     })
 }
 
-createOffersFixtures(() => {
-  createFixtures()
-})
+createFixtures()
