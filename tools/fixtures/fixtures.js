@@ -143,20 +143,20 @@ function createOffersFixtures () {
     var lat
     var lon
     if (count === 1) {
-      lat = 43.62613531177415 + randomFloat(0.02)
-      lon = 3.9056396484375 + randomFloat(0.02)
+      lat = 43.62613531177415 + randomFloat(4)
+      lon = 3.9056396484375 + randomFloat(4)
       count++
     } else if (count === 2) {
-      lat = 43.62613531177415 - randomFloat(0.02)
-      lon = 3.9056396484375 - randomFloat(0.02)
+      lat = 43.62613531177415 - randomFloat(4)
+      lon = 3.9056396484375 - randomFloat(4)
       count++
     } else if (count === 3) {
-      lat = 43.62613531177415 - randomFloat(0.02)
-      lon = 3.9056396484375 + randomFloat(0.02)
+      lat = 43.62613531177415 - randomFloat(4)
+      lon = 3.9056396484375 + randomFloat(4)
       count++
     } else if (count === 4) {
-      lat = 43.62613531177415 + randomFloat(0.02)
-      lon = 3.9056396484375 - randomFloat(0.02)
+      lat = 43.62613531177415 + randomFloat(4)
+      lon = 3.9056396484375 - randomFloat(4)
       count++
     } else {
       count = 1

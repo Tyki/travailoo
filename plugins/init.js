@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-// import * as VueGoogleMaps from '~/node_modules/vue2-google-maps/src/main'
+import * as VueGoogleMaps from '~/node_modules/vue2-google-maps/src/main'
 import EventBus from '~/helpers/eventBus'
 import Toasted from 'vue-toasted'
 import Kuzzle from 'kuzzle-sdk'
@@ -49,16 +49,29 @@ window.onNuxtReady(() => {
       position: 'top-right'
     })
 
-  // Vue.use(VueGoogleMaps, {
-  //   load: {
-  //     key: process.env.API_KEY,
-  //     libraries: 'places'
-  //     // This is required if you use the Autocomplete plugin
-  //     // OR: libraries: 'places,drawing'
-  //     // OR: libraries: 'places,drawing,visualization'
-  //     // (as you require)
-  //   }
-  // })
+  Vue.toasted.register('toastInfo',
+    (payload) => {
+      if (!payload.message) {
+        return 'Information missing!'
+      }
+      return payload.message
+    }, {
+      type: 'info',
+      icon: 'done',
+      duration: 3000,
+      position: 'top-right'
+    })
+
+  Vue.use(VueGoogleMaps, {
+    load: {
+      key: process.env.API_KEY,
+      libraries: 'places'
+      // This is required if you use the Autocomplete plugin
+      // OR: libraries: 'places,drawing'
+      // OR: libraries: 'places,drawing,visualization'
+      // (as you require)
+    }
+  })
 
   // Init the eventBus
   Vue.prototype.$eventBus = EventBus

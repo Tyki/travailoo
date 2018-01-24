@@ -45,11 +45,14 @@ export const getOffersAround = (lat, lng, zoom, kuzzle, callback) => {
 
   let options = {
     from: 0,
-    size: 1000,
-    scroll: '10s'
+    size: 1000
+    // scroll: '10s'
   }
 
-  let accumulator
+  let accumulator = {
+    offers: [],
+    limit: false
+  }
 
   kuzzle.collection('data', 'offers')
     .search(search, options, (error, offers) => {
@@ -58,36 +61,28 @@ export const getOffersAround = (lat, lng, zoom, kuzzle, callback) => {
         return callback(error)
       }
 
-      if (offers.getDocuments().length !== 1000) {
-        accumulator = offers.getDocuments().map(offer => {
-          return {
-            ...offer.content,
-            id: offer.id,
-            jobPosition: {
-              lat: offer.content.jobPosition.lat,
-              lng: offer.content.jobPosition.lon
-            }
+      accumulator.offers = offers.getDocuments().map(offer => {
+        return {
+          ...offer.content,
+          id: offer.id,
+          jobPosition: {
+            lat: offer.content.jobPosition.lat,
+            lng: offer.content.jobPosition.lon
           }
-        })
+        }
+      })
 
-        return callback(accumulator)
-      } else {
-        accumulator = offers.getDocuments().map(offer => {
-          return {
-            ...offer.content,
-            id: offer.id,
-            jobPosition: {
-              lat: offer.content.jobPosition.lat,
-              lng: offer.content.jobPosition.lon
-            }
-          }
-        })
-
-        return scrollSearch(accumulator, offers.options.scrollId, kuzzle, callback)
+      if (offers.getDocuments().length === 1000) {
+        accumulator.limit = true
       }
+
+      callback(accumulator)
     })
 }
 
+/**
+ * Scroll search for more points
+ */
 export const scrollSearch = (accumulator, scrollId, kuzzle, callback) => {
   kuzzle.collection('data', 'offers')
     .scroll(scrollId, {scroll: '10s'}, (error, offers) => {

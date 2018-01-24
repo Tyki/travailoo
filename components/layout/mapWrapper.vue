@@ -82,7 +82,7 @@ export default {
       this.timeout = setTimeout(() => {
         if (!this.working) {
           this.working = true
-          getOffersAround(this.lat, this.lng, this.zoom, this.$kuzzle, (offers) => {
+          getOffersAround(this.lat, this.lng, this.zoom, this.$kuzzle, (result) => {
             // this.offers = offers
 
             if (this.map.getLayer('clusters')) {
@@ -94,7 +94,8 @@ export default {
               this.map.removeSource('earthquakes')
             }
             this.features = []
-            offers.forEach(offer => {
+
+            result.offers.forEach(offer => {
               this.features.push({
                 'type': 'Feature',
                 'geometry': {
@@ -115,8 +116,6 @@ export default {
 
             this.map.addSource('earthquakes', {
               type: 'geojson',
-              // Point to GeoJSON data. This example visualizes all M1.0+ earthquakes
-              // from 12/22/15 to 1/21/16 as logged by USGS' Earthquake hazards program.
               data: geoJson,
               cluster: true,
               clusterMaxZoom: 14, // Max zoom to cluster points on
@@ -129,11 +128,6 @@ export default {
               source: 'earthquakes',
               filter: ['has', 'point_count'],
               paint: {
-                // Use step expressions (https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-step)
-                // with three steps to implement three types of circles:
-                //   * Blue, 20px circles when point count is less than 100
-                //   * Yellow, 30px circles when point count is between 100 and 750
-                //   * Pink, 40px circles when point count is greater than or equal to 750
                 'circle-color': [
                   'step',
                   ['get', 'point_count'],
@@ -180,6 +174,11 @@ export default {
               }
             })
 
+            if (result.limit === true) {
+              this.$toasted.global.toastInfo({
+                message: 'Résultats limités aux 1000 premiers résultats. Merci de filtrer votre recherche'
+              })
+            }
             this.working = false
           })
         }
@@ -198,7 +197,6 @@ export default {
       this.map.on('zoom', () => {
         this.zoom = parseInt(this.map.getZoom())
 
-        console.log(this.zoom)
         if (this.zoom < 9) {
           this.map.setZoom(9)
         }
@@ -207,12 +205,13 @@ export default {
       this.map.on('zoomend', () => {
         this.zoom = parseInt(this.map.getZoom())
 
-        console.log(this.zoom)
         if (this.zoom < 9) {
           this.map.setZoom(9)
         } else {
           this.map.setZoom(this.map.getZoom())
         }
+
+        this.updateJobs()
       })
     }
   },
