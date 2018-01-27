@@ -74,6 +74,14 @@ export default {
       })
     }
   },
+  mounted () {
+    this.$kuzzle.addListener('tokenExpired', () => {
+      this.$store.commit('user/changeLoggedStatus', false)
+      this.$toasted.global.toastError({
+        message: 'Vous avez été déconnecté pour cause d\'inactivité'
+      })
+    })
+  },
   created () {
     let jwt = localStorage.getItem('jwt')
     if (jwt) {

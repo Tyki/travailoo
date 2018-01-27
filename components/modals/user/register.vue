@@ -71,7 +71,7 @@ export default {
     ],
     passwordRules: [
       (v) => !!v || 'Le mot de passe est requis',
-      (v) => v.length > 8 || 'Votre mot de passe ne contient pas au moins 8 caractères'
+      (v) => v.length >= 8 || 'Votre mot de passe ne contient pas au moins 8 caractères'
     ]
   }),
   methods: {

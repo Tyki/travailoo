@@ -11,15 +11,18 @@
     </v-toolbar-title>
 
     <!-- Search Box -->
-    <v-layout row align-center style="max-width: 650px">
+    <v-layout row align-center>
       <v-text-field
         light
         solo
         prepend-icon="search"
-        placeholder="Search"
+        placeholder="Chercher une adresse..."
         style="max-width: 500px; min-width: 128px"
       ></v-text-field>
+      <v-btn color="primary" @click.native="$eventBus.$emit('Search::ShowFilters')">Affiner votre recherche</v-btn>
+
     </v-layout>
+
 
     <!-- Right buttons -->
     <div class="d-flex align-center" style="margin-left: auto">
