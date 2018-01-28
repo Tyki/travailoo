@@ -116,6 +116,8 @@
 </template>
 
 <script>
+import { searchJobLabels } from '~/helpers/labelHelper'
+
 export default {
   name: 'createJobStep2',
   props: [
@@ -169,15 +171,8 @@ export default {
       this.searchInterval = setTimeout(() => {
         this.loading = true
 
-        this.searchedJobs = []
+        this.searchedJobs = searchJobLabels(searchTerm)
 
-        Object.keys(this.jobs).forEach(fullIdentifier => {
-          this.jobs[fullIdentifier].forEach(document => {
-            if (document.content.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
-              this.searchedJobs.push({name: document.content.name, code: document.content.code})
-            }
-          })
-        })
         this.loading = false
       }, 1000)
     },
@@ -191,53 +186,6 @@ export default {
         return (this.chosenCategory !== '' && this.chosenCategory.hasOwnProperty('category') && this.chosenCategory.category !== '' &&
                this.chosenMidCategory !== '' && this.chosenMidCategory.hasOwnProperty('midCategory') && this.chosenMidCategory.midCategory !== '' &&
                this.chosenSubCategory !== '' && this.chosenSubCategory.hasOwnProperty('subCategory') && this.chosenSubCategory.subCategory !== '')
-      }
-    },
-    /**
-      Start the scroll for jobs labels
-    */
-    fetchJobs (accumulator) {
-      this.$kuzzle.collection('jobs', 'labels').search({query: {match_all: {}}}, {size: 1000, scroll: '1s'}, (error, result) => {
-        if (error) {
-          console.log(error)
-        }
-
-        result.getDocuments().forEach(document => {
-          if (!Array.isArray(accumulator[document.content.fullIdentifier])) {
-            accumulator[document.content.fullIdentifier] = []
-          }
-          accumulator[document.content.fullIdentifier].push(document)
-        })
-
-        if (result.options.scrollId) {
-          this.scrollFetchJobs(result.options.scrollId, accumulator)
-        }
-      })
-    },
-    /**
-      Scrolling all the jobs labels
-    */
-    scrollFetchJobs (scrollId, accumulator) {
-      if (scrollId) {
-        this.$kuzzle.collection('jobs', 'labels').scroll(scrollId, {scroll: '1s'}, (error, result) => {
-          if (error) {
-            console.log(error)
-          }
-
-          result.getDocuments().forEach(document => {
-            if (!Array.isArray(accumulator[document.content.fullIdentifier])) {
-              accumulator[document.content.fullIdentifier] = []
-            }
-            accumulator[document.content.fullIdentifier].push(document)
-          })
-
-          if (result.getDocuments().length !== 0 && result.options.scrollId) {
-            this.scrollFetchJobs(result.options.scrollId, accumulator)
-          } else {
-            // Done with scroll, push into vuex
-            this.jobs = accumulator
-          }
-        })
       }
     },
     cancel () {
@@ -280,8 +228,6 @@ export default {
     })
   },
   created () {
-    this.fetchJobs({})
-
     this.categories = Object.keys(this.$store.state.jobs.categories).map(category => {
       return {category, name: this.$store.state.jobs.categories[category]}
     })

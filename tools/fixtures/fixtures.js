@@ -97,6 +97,7 @@ function createFixtures () {
             subCategory,
             code,
             name,
+            lowerCasedName: name.toLowerCase(),
             fullIdentifier: category + '-' + midCategory + '-' + subCategory
           })
         }
@@ -165,26 +166,13 @@ function createOffersFixtures () {
     document.jobPosition.lat = lat
     document.jobPosition.lon = lon
 
-    var experience = getRandomInt(3)
-    if (experience === 0 || experience === 1) {
-      experience = {
-        'key': 1,
-        'label': 'Débutant'
-      }
-    } else if (experience === 2) {
-      experience = {
-        'key': 2,
-        'label': 'Confirmé'
-      }
-    } else if (experience === 3) {
-      experience = {
-        'key': 3,
-        'label': 'Senior'
-      }
+    var experience = getRandomInt(4)
+    if (experience === 0) {
+      experience = 1
     }
     document.experience.push(experience)
 
-    var offerType = getRandomInt(7)
+    var offerType = getRandomInt(8)
     if (offerType === 0) {
       offerType = 1
     }
@@ -225,6 +213,7 @@ function insertData () {
     .then(() => kuzzle.collection('midCategories', 'labels').createPromise())
     .then(() => kuzzle.collection('subCategories', 'labels').createPromise())
     .then(() => kuzzle.collection('jobs', 'labels').createPromise())
+    .then(() => kuzzle.collection('jobs', 'labels').collectionMapping({'lowerCasedName': {type: 'keyword'}}).applyPromise())
     .then(() => kuzzle.queryPromise({controller: 'bulk', action: 'import'}, {body: {bulkData: data}}))
     .then(() => createOffersFixtures())
     .then(() => createOffersFixtures())

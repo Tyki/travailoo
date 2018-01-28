@@ -1,5 +1,6 @@
 <template lang="html">
-  <v-app white id="inspire">
+  <v-app white id="inspire" v-if="loaded">
+
     <!-- Navbar and user left menu -->
     <user-drawer-wrapper />
     <navbar />
@@ -12,7 +13,19 @@
 
     <!-- Wrapper modals -->
     <modal-wrapper />
+  </v-app>
 
+  <v-app v-else>
+    <v-progress-circular
+        v-bind:size="100"
+        v-bind:width="15"
+        v-bind:rotate="-90"
+        v-bind:value="loadingPercentile"
+        color="primary"
+        style="position: absolute; top:50vh; left:50vw"
+      >
+      {{ loadingPercentile }}
+    </v-progress-circular>
   </v-app>
 </template>
 
@@ -22,6 +35,7 @@ import mapWrapper from '~/components/layout/mapWrapper'
 import jobDrawerWrapper from '~/components/layout/job/jobDrawerWrapper'
 import userDrawerWrapper from '~/components/layout/user/userDrawerWrapper'
 import modalWrapper from '~/components/modals/modalWrapper'
+import { loadJobs } from '~/helpers/labelHelper'
 
 export default {
   components: {
@@ -31,6 +45,10 @@ export default {
     userDrawerWrapper,
     modalWrapper
   },
+  data: () => ({
+    loaded: false,
+    loadingPercentile: 0
+  }),
   methods: {
     fetchJobsData () {
       let options = {
@@ -52,12 +70,16 @@ export default {
 
         this.$store.commit('jobs/addToCategories', result.getDocuments())
 
+        this.loadingPercentile = 25
+
         // Mid Categories
         this.$kuzzle.collection('midCategories', 'labels').search(body, options, (error, result) => {
           if (error) {
             console.log(error)
           }
           this.$store.commit('jobs/addToMidCategories', result.getDocuments())
+
+          this.loadingPercentile = 50
 
           // Sub Categories
           this.$kuzzle.collection('subCategories', 'labels').search(body, options, (error, result) => {
@@ -66,9 +88,12 @@ export default {
             }
             this.$store.commit('jobs/addToSubCategories', result.getDocuments())
 
-            // Desactivate this line to store all available jobs inside vuex
-            // It crash the vue-devtools
-            // this.fetchJobs({})
+            this.loadingPercentile = 75
+
+            loadJobs(this.$kuzzle, () => {
+              this.loadingPercentile = 100
+              this.loaded = true
+            })
           })
         })
       })
@@ -122,5 +147,12 @@ body {
 
 ::-webkit-scrollbar {
     display: none;
+}
+
+.fade-enter-active, .fade-leave-active {
+  transition: opacity .5s
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+  opacity: 0
 }
 </style>

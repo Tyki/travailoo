@@ -21,15 +21,59 @@ const zoomToKm = {
   '20': 0.25
 }
 
-export const getOffersAround = (lat, lng, zoom, kuzzle, callback) => {
+/**
+* Method to search the jobs around a geopoint
+*
+*/
+export const getOffersAround = (lat, lng, zoom, filters, kuzzle, callback) => {
+  var mustFilters = []
+  var shouldFilters = []
+  if (filters.hasOwnProperty('code') || filters.hasOwnProperty('offerType') || filters.hasOwnProperty('experience')) {
+    if (filters.hasOwnProperty('code')) {
+      mustFilters.push({
+        term: {
+          jobCode: filters.code
+        }
+      })
+    }
+
+    if (filters.hasOwnProperty('offerType')) {
+      mustFilters.push({
+        term: {
+          offerType: filters.offerType
+        }
+      })
+    }
+
+    if (filters.hasOwnProperty('experience')) {
+      filters.experience.forEach(experienceKey => {
+        if (isNumber(experienceKey)) {
+          shouldFilters.push({
+            term: {
+              experience: experienceKey
+            }
+          })
+        }
+      })
+
+      mustFilters.push({
+        bool: {
+          should: shouldFilters
+        }
+      })
+    }
+  } else {
+    mustFilters = {
+      match_all: {
+        boost: '1.0'
+      }
+    }
+  }
+
   let search = {
     query: {
       bool: {
-        must: {
-          match_all: {
-            boost: '1.0'
-          }
-        },
+        must: mustFilters,
         filter: {
           geo_distance: {
             distance: zoomToKm[zoom] + 'km',
@@ -42,6 +86,8 @@ export const getOffersAround = (lat, lng, zoom, kuzzle, callback) => {
       }
     }
   }
+
+  console.dir(search, {depth: null})
 
   let options = {
     from: 0,
@@ -76,13 +122,16 @@ export const getOffersAround = (lat, lng, zoom, kuzzle, callback) => {
         accumulator.limit = true
       }
 
+      console.log(accumulator.offers.length)
+
       callback(accumulator)
     })
 }
 
 /**
- * Scroll search for more points
- */
+* Scroll search for more points
+* Recursive !
+*/
 export const scrollSearch = (accumulator, scrollId, kuzzle, callback) => {
   kuzzle.collection('data', 'offers')
     .scroll(scrollId, {scroll: '10s'}, (error, offers) => {
@@ -118,4 +167,8 @@ export const scrollSearch = (accumulator, scrollId, kuzzle, callback) => {
         return scrollSearch(accumulator, offers.options.scrollId, kuzzle, callback)
       }
     })
+}
+
+const isNumber = (n) => {
+  return !isNaN(parseFloat(n)) && isFinite(n)
 }

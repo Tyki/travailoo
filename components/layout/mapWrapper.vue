@@ -1,7 +1,8 @@
 <template lang='html'>
   <div>
     <div id='map' class='map' style='width: 100vw; height: 100vh'></div>
-    <search-engine v-if="showFilters" />
+    <!-- TODO : pass saved filter to the search engine in case the user closed the search -->
+    <search-engine v-if="showFilters" :filters="filters"/>
   </div>
 </template>
 
@@ -24,13 +25,14 @@ export default {
       lat: '',
       lng: ''
     },
-    zoom: 10,
+    zoom: 8,
     map: null,
     timeout: null,
     features: [],
     working: false,
     showLayers: 'visible',
-    showFilters: false
+    showFilters: false,
+    filters: {}
   }),
   computed: {
     mapMode () {
@@ -75,7 +77,7 @@ export default {
       this.timeout = setTimeout(() => {
         if (!this.working && this.mapMode === mapModes.default.showJobs) {
           this.working = true
-          getOffersAround(this.lat, this.lng, this.zoom, this.$kuzzle, (result) => {
+          getOffersAround(this.lat, this.lng, this.zoom, this.filters, this.$kuzzle, (result) => {
             // Remove layers and source
             if (this.map.getLayer('clusters')) {
               this.map.removeLayer('clusters')
@@ -256,6 +258,11 @@ export default {
 
     this.$eventBus.$on('Search::ShowFilters', () => {
       this.showFilters = !this.showFilters
+    })
+
+    this.$eventBus.$on('Search::FilterSearch', (payload) => {
+      this.filters = payload
+      this.updateJobs()
     })
 
     mapboxgl.accessToken = 'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
