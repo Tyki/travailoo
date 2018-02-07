@@ -190,6 +190,10 @@ export default {
       }
     },
     cancel () {
+      // restore map Mode
+      this.$store.commit('map/switchToMapModeShowJobs')
+      this.$eventBus.$emit('Jobs::CancelCreate')
+
       this.resetComponent()
     },
     resetComponent () {
