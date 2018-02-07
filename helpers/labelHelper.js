@@ -83,3 +83,11 @@ export const searchJobLabels = (searchTerm) => {
 
   return result
 }
+
+export const searchJobsByFullIdentifier = (fullIdentifier) => {
+  if (allJobs.hasOwnProperty(fullIdentifier)) {
+    return allJobs[fullIdentifier]
+  } else {
+    return []
+  }
+}

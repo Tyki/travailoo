@@ -221,6 +221,8 @@ export default {
         if (this.mapMode === mapModes.default.create) {
           this.createNewJobPosition.lat = e.lngLat.lat
           this.createNewJobPosition.lng = e.lngLat.lng
+
+          this.$eventBus.$emit('Jobs::PositionStep1', this.createNewJobPosition)
         }
       })
     }

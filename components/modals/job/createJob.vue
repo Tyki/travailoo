@@ -75,8 +75,8 @@ export default {
     // Click on the map to fetch the exact GPS position of the new job
     this.$eventBus.$on('Jobs::PositionStep1', (jobPosition) => {
       this.showValidate = true
-      this.newJobPosition.lat = jobPosition.lat()
-      this.newJobPosition.lng = jobPosition.lng()
+      this.newJobPosition.lat = jobPosition.lat
+      this.newJobPosition.lng = jobPosition.lng
     })
 
     this.$eventBus.$on('Modals::close', () => {
