@@ -56,7 +56,6 @@ export default {
 
     mapClickHandler (position) {
       if (this.mapMode === mapModes.default.create) {
-        
         this.createNewJobPosition.lat = position.latLng.lat()
         this.createNewJobPosition.lng = position.latLng.lng()
 
