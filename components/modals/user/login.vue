@@ -65,23 +65,30 @@ export default {
   }),
   methods: {
     logUser () {
-      this.$kuzzle.loginPromise('local',
-        {
-          username: this.email.toLowerCase(),
-          password: this.password
-        }, this.stayConnected ? '385 days' : '12h')
-        .then((response) => {
-          // Store JWT in LocalStorage if the user checked stayConnectedf
-          if (this.stayConnected) {
-            localStorage.setItem('jwt', response.jwt)
+      const data = {username: this.email.toLowerCase(), password: this.password}
+      this.$kuzzle.login('local', data, this.stayConnected ? '385 days' : '12h', (error, response) => {
+        if (error) {
+          // Handle error
+          if (error.status === 401) {
+            // Wrong credentials
+            this.$toasted.global.toastError({
+              message: this.$t('errors.wrong_credentials')
+            })
+          } else {
+            this.$toasted.global.toastError()
           }
+        }
 
-          // Store loggedStatus
-          this.$store.commit('user/changeLoggedStatus', true)
+        if (this.stayConnected) {
+          localStorage.setItem('jwt', response.jwt)
+        }
 
-          return this.$kuzzle.whoAmIPromise()
-        })
-        .then((user) => {
+        // Store loggedStatus
+        this.$store.commit('user/changeLoggedStatus', true)
+
+        this.$kuzzle.whoAmI((error, user) => {
+          if (error) { this.$toasted.global.toastError() }
+
           if (user.hasOwnProperty('content') && user.content.hasOwnProperty('firstname')) {
             this.$store.commit('user/updateUserFirstname', user.content.firstname)
           }
@@ -92,16 +99,7 @@ export default {
 
           this.$eventBus.$emit('Modals::close')
         })
-        .catch((error) => {
-          if (error.status === 401) {
-            // Wrong credentials
-            this.$toasted.global.toastError({
-              message: this.$t('errors.wrong_credentials')
-            })
-          } else {
-            this.$toasted.global.toastError()
-          }
-        })
+      })
     },
     openRegister () {
       openSpecificModal('openRegister')

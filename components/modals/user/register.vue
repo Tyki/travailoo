@@ -94,9 +94,7 @@ export default {
         this.working = true
 
         const email = this.email.toLowerCase()
-
-        // Creating the user in the backend
-        this.$kuzzle.security.createUserPromise(email, {
+        const data = {
           content: {
             profileIds: ['default'],
             firstname: this.firstname,
@@ -108,18 +106,11 @@ export default {
               'password': this.password
             }
           }
-        }, {refresh: 'wait_for'})
-          .then(response => {
-            this.$toasted.global.toastSuccess({
-              message: this.$t('success.account_created')
-            })
+        }
 
-            this.working = false
-
-            // TODO : connect the user?
-            // TODO : reset v-models
-            this.$eventBus.$emit('Modals::close')
-          }).catch(error => {
+        // Creating the user in the backend
+        this.$kuzzle.security.createUser(email, data, {refresh: 'wait_for'}, (error, response) => {
+          if (error) {
             this.working = false
             if (error.status === 412) {
               // Email already exists!
@@ -127,9 +118,51 @@ export default {
                 message: this.$t('errors.email_already_exists')
               })
             } else {
-              this.$toasted.global.toastError()
+              this.$toasted.global.toastError({
+                message: 'Erreur lors de la création'
+              })
             }
+
+            return
+          }
+
+          this.$kuzzle.login('local', {username: email, password: this.password}, '12h', (error, response) => {
+            if (error) {
+              // Handle error
+              if (error.status === 401) {
+                // Wrong credentials
+                this.$toasted.global.toastError({
+                  message: this.$t('errors.wrong_credentials')
+                })
+              } else {
+                this.$toasted.global.toastError()
+              }
+
+              return
+            }
+
+            // Store loggedStatus
+            this.$store.commit('user/changeLoggedStatus', true)
+
+            this.$kuzzle.whoAmI((error, user) => {
+              if (error) { this.$toasted.global.toastError(); return }
+
+              if (user.hasOwnProperty('content') && user.content.hasOwnProperty('firstname')) {
+                this.$store.commit('user/updateUserFirstname', user.content.firstname)
+              }
+
+              this.$toasted.global.toastSuccess({
+                message: this.$t('success.account_created')
+              })
+
+              this.working = false
+
+              // TODO : connect the user?
+              // TODO : reset v-models
+              this.$eventBus.$emit('Modals::close')
+            })
           })
+        })
       }
     }
   },
@@ -144,6 +177,3 @@ export default {
   }
 }
 </script>
-
-<style lang="css">
-</style>

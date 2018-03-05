@@ -56,6 +56,7 @@ export default {
 
     mapClickHandler (position) {
       if (this.mapMode === mapModes.default.create) {
+        
         this.createNewJobPosition.lat = position.latLng.lat()
         this.createNewJobPosition.lng = position.latLng.lng()
 
@@ -130,29 +131,11 @@ export default {
         id: 'clusters',
         type: 'circle',
         source: 'offers',
-        filter: ['has', 'point_count'],
         layout: {
           visibility: this.showLayers
         },
         paint: {
-          'circle-color': [
-            'step',
-            ['get', 'point_count'],
-            '#51bbd6',
-            100,
-            '#f1f075',
-            750,
-            '#f28cb1'
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20,
-            100,
-            30,
-            750,
-            40
-          ]
+          'circle-color': '#cc3300'
         }
       })
 
@@ -160,26 +143,8 @@ export default {
         id: 'unclustered-point',
         type: 'circle',
         source: 'offers',
-        filter: ['!has', 'point_count'],
         paint: {
-          'circle-color': [
-            'step',
-            ['get', 'point_count'],
-            '#51bbd6',
-            100,
-            '#f1f075',
-            750,
-            '#f28cb1'
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20,
-            100,
-            30,
-            750,
-            40
-          ]
+          'circle-color': '#cc3300'
         },
         layout: {
           visibility: this.showLayers
@@ -188,7 +153,6 @@ export default {
     },
 
     bindMapEvents () {
-      // this.map
       this.map.on('dragend', () => {
         this.lat = this.map.getCenter().lat
         this.lng = this.map.getCenter().lng
