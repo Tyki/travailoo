@@ -1,8 +1,8 @@
 <template lang='html'>
-  <div v-bind:class="{ hidden: !mapLoaded }">
+  <div v-bind:class='{ hidden: !mapLoaded }'>
     <div id='map' class='map' style='width: 100vw; height: 100vh'></div>
     <!-- TODO : pass saved filter to the search engine in case the user closed the search -->
-    <search-engine v-if="showFilters" :filters="filters"/>
+    <search-engine v-if='showFilters' :filters='filters'/>
   </div>
 </template>
 
@@ -52,15 +52,6 @@ export default {
       })
 
       this.updateJobs(this.map.getBounds())
-    },
-
-    mapClickHandler (position) {
-      if (this.mapMode === mapModes.default.create) {
-        this.createNewJobPosition.lat = position.latLng.lat()
-        this.createNewJobPosition.lng = position.latLng.lng()
-
-        this.$eventBus.$emit('Jobs::PositionStep1', (position.latLng))
-      }
     },
 
     updateCenter (position) {
@@ -168,6 +159,32 @@ export default {
           this.createNewJobPosition.lat = e.lngLat.lat
           this.createNewJobPosition.lng = e.lngLat.lng
 
+          if (this.map.getLayer('new-job-point')) {
+            this.map.removeLayer('new-job-point')
+            this.map.removeSource('new-job-point')
+          }
+
+          this.map.addLayer({
+            id: 'new-job-point',
+            type: 'circle',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'FeatureCollection',
+                features: [{
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [this.createNewJobPosition.lng, this.createNewJobPosition.lat]
+                  }
+                }]
+              }
+            },
+            paint: {
+              'circle-color': '#cc3300'
+            }
+          })
+
           this.$eventBus.$emit('Jobs::PositionStep1', this.createNewJobPosition)
         }
       })
@@ -178,6 +195,11 @@ export default {
       if (this.mapMode === mapModes.default.create) {
         this.showLayers = 'none'
       } else {
+        // Changing mode => Cancel the layer
+        if (this.map.getLayer('new-job-point')) {
+          this.map.removeLayer('new-job-point')
+        }
+
         this.showLayers = 'visible'
         // Get the points after a cancel where the map is
         this.lat = this.map.getCenter().lat
