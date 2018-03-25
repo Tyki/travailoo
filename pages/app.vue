@@ -8,7 +8,7 @@
     </no-ssr>
 
     <no-ssr>
-      <search-engine v-if='showFilters' :filters='filters'/>
+      <search-engine v-if='showFilters'/>
     </no-ssr>      
 
     <!-- Navbar and user left menu -->

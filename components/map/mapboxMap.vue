@@ -1,17 +1,23 @@
 <template lang='html'>
   <div v-bind:class='{ hidden: !mapLoaded }'>
-    <div id='map' class='map' style='width: 100vw; height: 100vh'></div>
+    <div id='map' style='width: 100vw; height: 100vh'></div>
+
+    <!-- <mapbox-marker v-for='offer in offers' v-bind:offer='offer' v-bind:key='offer.id' /> -->
   </div>
 </template>
 
 <script>
 import * as mapModes from '@/services/constants/mapModes'
 import { getOffersAround } from '@/services/helpers/jobHelper'
+import mapboxMarker from '@/components/map/mapboxMarker'
 
 /* eslint-disable no-undef */
 /* eslint-disable no-new */
 export default {
   name: 'map',
+  components: {
+    mapboxMarker
+  },
   data: () => ({
     lat: 48.864716,
     lng: 2.349014,
@@ -25,9 +31,8 @@ export default {
     features: [],
     working: false,
     showLayers: 'visible',
-    showFilters: false,
-    filters: {},
-    mapLoaded: false
+    mapLoaded: false,
+    offers: []
   }),
   computed: {
     mapMode () {
@@ -48,15 +53,6 @@ export default {
       this.updateJobs(this.map.getBounds())
     },
 
-    updateCenter (position) {
-      this.lat = position.lat()
-      this.lng = position.lng()
-
-      this.map.setCenter(this.lng, this.lat)
-
-      this.updateJobs()
-    },
-
     updateJobs (bounds) {
       clearTimeout(this.timeout)
 
@@ -65,13 +61,23 @@ export default {
           this.working = true
 
           // Fetching the jobs at the new center
-          getOffersAround(bounds, this.filters, this.$kuzzle, (result) => {
+          // TODO : send filters from store
+          getOffersAround(bounds, {}, this.$kuzzle, (result) => {
+            if (result.error) {
+              console.log(result.error)
+            }
+
+            this.offers = this.offers.slice(0, this.offers.length)
+            result.forEach(offer => {
+              this.offers.push(offer)
+            })
             // Remove layers and source
 
             // TODO : use components now
-            /* if (this.map.getLayer('clusters')) {
+            if (this.map.getLayer('clusters')) {
               this.map.removeLayer('clusters')
               this.map.removeLayer('unclustered-point')
+              this.map.removeLayer('cluster-count')
             }
 
             if (this.map.getSource('offers')) {
@@ -79,7 +85,14 @@ export default {
             }
             this.features = []
 
-            result.offers.forEach(offer => {
+            this.ids = {}
+
+            result.forEach(offer => {
+              if (!this.ids[offer.id]) {
+                this.ids[offer.id] = 1
+              } else {
+                this.ids[offer.id] = this.ids[offer.id]++
+              }
               this.features.push({
                 'type': 'Feature',
                 'geometry': {
@@ -87,16 +100,14 @@ export default {
                   'coordinates': [offer.jobPosition.lng, offer.jobPosition.lat]
                 },
                 'properties': {
-                  'title': '',
-                  'icon': 'marker'
+
+                  'icon': 'marker',
+                  ...offer
                 }
               })
             })
 
-            this.redrawLayers({
-              'type': 'FeatureCollection',
-              'features': this.features
-            }) */
+            this.redrawLayers(this.features)
 
             this.working = false
           })
@@ -104,24 +115,41 @@ export default {
       }, 400)
     },
 
-    redrawLayers (geoJson) {
-      /* this.map.addSource('offers', {
+    redrawLayers (features) {
+      this.map.addSource('offers', {
         type: 'geojson',
-        data: geoJson,
+        data: {
+          type: 'FeaturesCollection',
+          features
+        },
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: this.zoom // Radius of each cluster when clustering points (defaults to 50)
+        clusterRadius: 20 // Radius of each cluster when clustering points (defaults to 50)
       })
 
       this.map.addLayer({
         id: 'clusters',
         type: 'circle',
         source: 'offers',
+        filter: ['has', 'point_count'],
         layout: {
           visibility: this.showLayers
         },
         paint: {
-          'circle-color': '#cc3300'
+          'circle-color': '#cc3300',
+          'circle-radius': ['step', ['get', 'point_count'], 10, 100, 30, 750, 40]
+        }
+      })
+
+      this.map.addLayer({
+        id: 'cluster-count',
+        type: 'symbol',
+        source: 'offers',
+        filter: ['has', 'point_count'],
+        layout: {
+          'text-field': '{point_count_abbreviated}',
+          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+          'text-size': 12
         }
       })
 
@@ -129,16 +157,29 @@ export default {
         id: 'unclustered-point',
         type: 'circle',
         source: 'offers',
+        filter: ['!has', 'point_count'],
         paint: {
           'circle-color': '#cc3300'
         },
         layout: {
           visibility: this.showLayers
         }
-      }) */
+      })
     },
 
     bindMapEvents () {
+      this.map.on('load', () => {
+        // Send the information that the map is ready and we can rmeove the loader
+        this.mapLoaded = true
+        this.$eventBus.$emit('UI::MapLoaded')
+      })
+
+      this.map.on('click', (e) => {
+        var bbox = [[e.point.x - 5, e.point.y - 5], [e.point.x + 5, e.point.y + 5]]
+        var features = this.map.queryRenderedFeatures(bbox, {layers: ['unclustered-point', 'clusters']})
+        console.log(features)
+      })
+
       this.map.on('dragend', () => {
         this.lat = this.map.getCenter().lat
         this.lng = this.map.getCenter().lng
@@ -236,12 +277,6 @@ export default {
       style: 'mapbox://styles/mapbox/streets-v10',
       zoom: 8,
       center: [this.lng, this.lat]
-    })
-
-    this.map.on('load', () => {
-      // Send the information that the map is ready and we can rmeove the loader
-      this.mapLoaded = true
-      this.$eventBus.$emit('UI::MapLoaded')
     })
 
     this.bindMapEvents()

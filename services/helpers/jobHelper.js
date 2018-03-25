@@ -83,13 +83,11 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
 
   let options = {
     from: 0,
+    scroll: '3s',
     size: 1000
   }
 
-  let accumulator = {
-    offers: [],
-    limit: false
-  }
+  let accumulator = []
 
   kuzzle.collection('data', 'offers')
     .search(search, options, (error, offers) => {
@@ -98,7 +96,9 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
         return callback(error)
       }
 
-      accumulator.offers = offers.getDocuments().map(offer => {
+      console.log(offers)
+
+      accumulator = offers.getDocuments().map(offer => {
         return {
           ...offer.content,
           id: offer.id,
@@ -110,10 +110,10 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
       })
 
       if (offers.getDocuments().length === 1000) {
-        accumulator.limit = true
+        return scrollSearch(accumulator, offers.options.scrollId, kuzzle, callback)
+      } else {
+        callback(accumulator)
       }
-
-      callback(accumulator)
     })
 }
 
@@ -123,36 +123,25 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
 */
 export const scrollSearch = (accumulator, scrollId, kuzzle, callback) => {
   kuzzle.collection('data', 'offers')
-    .scroll(scrollId, {scroll: '10s'}, (error, offers) => {
+    .scroll(scrollId, {scroll: '3s'}, (error, offers) => {
       if (error) {
         callback(error)
       }
 
-      if (offers.getDocuments().length !== 1000) {
-        offers.getDocuments().map(offer => {
-          accumulator.push({
-            ...offer.content,
-            id: offer.id,
-            jobPosition: {
-              lat: offer.content.jobPosition.lat,
-              lng: offer.content.jobPosition.lon
-            }
-          })
+      offers.getDocuments().forEach(offer => {
+        accumulator.push({
+          ...offer.content,
+          id: offer.id,
+          jobPosition: {
+            lat: offer.content.jobPosition.lat,
+            lng: offer.content.jobPosition.lon
+          }
         })
+      })
 
+      if (offers.getDocuments().length !== 1000) {
         return callback(accumulator)
       } else {
-        offers.getDocuments().map(offer => {
-          accumulator.push({
-            ...offer.content,
-            id: offer.id,
-            jobPosition: {
-              lat: offer.content.jobPosition.lat,
-              lng: offer.content.jobPosition.lon
-            }
-          })
-        })
-
         return scrollSearch(accumulator, offers.options.scrollId, kuzzle, callback)
       }
     })
