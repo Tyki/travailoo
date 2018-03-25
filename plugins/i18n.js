@@ -10,8 +10,8 @@ export default ({ app }) => {
   app.i18n = new VueI18n({
     locale: 'fr',
     messages: {
-      'fr': require('~/helpers/translations/fr.json'),
-      'en': require('~/helpers/translations/en.json')
+      'fr': require('~/services/translations/fr.json'),
+      'en': require('~/services/translations/en.json')
     }
   })
 }

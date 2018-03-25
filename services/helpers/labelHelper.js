@@ -1,6 +1,5 @@
 const allJobs = {}
 
-
 export const loadJobs = (kuzzle, callback) => {
   kuzzle.collection('jobs', 'labels').search({query: {match_all: {}}}, {size: 1000, scroll: '1s'}, (error, result) => {
     if (error) {

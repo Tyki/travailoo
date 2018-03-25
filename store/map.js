@@ -1,4 +1,4 @@
-import * as MapModes from '@/helpers/constants/mapModes'
+import * as MapModes from '@/services/constants/mapModes'
 
 // Modules
 let mapModes = MapModes.default

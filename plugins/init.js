@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuetify from 'vuetify'
-import EventBus from '~/helpers/eventBus'
+import EventBus from '~/services/helpers/eventBus'
 import Kuzzle from 'kuzzle-sdk'
 import wysiwyg from 'vue-wysiwyg'
 

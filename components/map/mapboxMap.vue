@@ -1,23 +1,17 @@
 <template lang='html'>
   <div v-bind:class='{ hidden: !mapLoaded }'>
     <div id='map' class='map' style='width: 100vw; height: 100vh'></div>
-    <!-- TODO : pass saved filter to the search engine in case the user closed the search -->
-    <search-engine v-if='showFilters' :filters='filters'/>
   </div>
 </template>
 
 <script>
-import * as mapModes from '@/services/helpers/constants/mapModes'
+import * as mapModes from '@/services/constants/mapModes'
 import { getOffersAround } from '@/services/helpers/jobHelper'
-import searchEngine from '@/components/layout/searchEngine'
 
 /* eslint-disable no-undef */
 /* eslint-disable no-new */
 export default {
-  name: 'mapWrapper',
-  components: {
-    searchEngine
-  },
+  name: 'map',
   data: () => ({
     lat: 48.864716,
     lng: 2.349014,
@@ -71,9 +65,11 @@ export default {
           this.working = true
 
           // Fetching the jobs at the new center
-          getOffersAround(bounds, this.zoom, this.filters, this.$kuzzle, (result) => {
+          getOffersAround(bounds, this.filters, this.$kuzzle, (result) => {
             // Remove layers and source
-            if (this.map.getLayer('clusters')) {
+
+            // TODO : use components now
+            /* if (this.map.getLayer('clusters')) {
               this.map.removeLayer('clusters')
               this.map.removeLayer('unclustered-point')
             }
@@ -100,7 +96,7 @@ export default {
             this.redrawLayers({
               'type': 'FeatureCollection',
               'features': this.features
-            })
+            }) */
 
             this.working = false
           })
@@ -109,7 +105,7 @@ export default {
     },
 
     redrawLayers (geoJson) {
-      this.map.addSource('offers', {
+      /* this.map.addSource('offers', {
         type: 'geojson',
         data: geoJson,
         cluster: true,
@@ -139,7 +135,7 @@ export default {
         layout: {
           visibility: this.showLayers
         }
-      })
+      }) */
     },
 
     bindMapEvents () {
@@ -150,7 +146,6 @@ export default {
       })
 
       this.map.on('zoomend', () => {
-        this.zoom = this.map.getZoom()
         this.updateJobs(this.map.getBounds())
       })
 
@@ -239,7 +234,7 @@ export default {
     this.map = new mapboxgl.Map({
       container: 'map',
       style: 'mapbox://styles/mapbox/streets-v10',
-      zoom: this.zoom,
+      zoom: 8,
       center: [this.lng, this.lat]
     })
 

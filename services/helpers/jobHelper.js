@@ -6,7 +6,7 @@
 * @param filters
 * @param callback
 */
-export const getOffersAround = (bounds, zoom, filters, kuzzle, callback) => {
+export const getOffersAround = (bounds, filters, kuzzle, callback) => {
   var topLeft = {
     lat: bounds._ne.lat,
     lon: bounds._sw.lng
@@ -20,7 +20,7 @@ export const getOffersAround = (bounds, zoom, filters, kuzzle, callback) => {
   var mustFilters = []
   var shouldFilters = []
 
-  /* 
+  /*
     Search engine : Construct the ES query based on filled checkboxes
   */
   if (filters.hasOwnProperty('code') || filters.hasOwnProperty('offerType') || filters.hasOwnProperty('experience')) {
