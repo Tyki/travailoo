@@ -49,7 +49,8 @@ module.exports = {
   ** Plugins
   */
   plugins: [
-    {ssr: false, src: '~plugins/init'},
-    '~/plugins/i18n.js'
+    '~plugins/init',
+    '~/plugins/i18n.js',
+    {ssr: false, src: '~/plugins/toast'}
   ]
 }

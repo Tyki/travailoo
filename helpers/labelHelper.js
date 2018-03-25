@@ -59,6 +59,10 @@ const scrollFetchJobs = (scrollId, kuzzle, callback) => {
  */
 export const searchJobLabels = (searchTerm) => {
   var result = []
+  if (searchTerm.toLowerCase() === '') {
+    return result
+  }
+
   Object.keys(allJobs).forEach(fullIdentifier => {
     allJobs[fullIdentifier].forEach(document => {
       if (document.content.name.toLowerCase().indexOf(searchTerm.toLowerCase()) !== -1) {
@@ -82,4 +86,12 @@ export const searchJobLabels = (searchTerm) => {
   })
 
   return result
+}
+
+export const searchJobsByFullIdentifier = (fullIdentifier) => {
+  if (allJobs.hasOwnProperty(fullIdentifier)) {
+    return allJobs[fullIdentifier]
+  } else {
+    return []
+  }
 }

@@ -1,8 +1,8 @@
 <template lang='html'>
-  <div>
+  <div v-bind:class='{ hidden: !mapLoaded }'>
     <div id='map' class='map' style='width: 100vw; height: 100vh'></div>
     <!-- TODO : pass saved filter to the search engine in case the user closed the search -->
-    <search-engine v-if="showFilters" :filters="filters"/>
+    <search-engine v-if='showFilters' :filters='filters'/>
   </div>
 </template>
 
@@ -32,7 +32,8 @@ export default {
     working: false,
     showLayers: 'visible',
     showFilters: false,
-    filters: {}
+    filters: {},
+    mapLoaded: false
   }),
   computed: {
     mapMode () {
@@ -44,22 +45,13 @@ export default {
       this.lat = position.coords.latitude
       this.lng = position.coords.longitude
 
-      // Set center
+      // Set center on the map
       this.map.setCenter({
         lat: this.lat,
         lng: this.lng
       })
 
-      this.updateJobs()
-    },
-
-    mapClickHandler (position) {
-      if (this.mapMode === mapModes.default.create) {
-        this.createNewJobPosition.lat = position.latLng.lat()
-        this.createNewJobPosition.lng = position.latLng.lng()
-
-        this.$eventBus.$emit('Jobs::PositionStep1', (position.latLng))
-      }
+      this.updateJobs(this.map.getBounds())
     },
 
     updateCenter (position) {
@@ -71,17 +63,18 @@ export default {
       this.updateJobs()
     },
 
-    updateJobs () {
+    updateJobs (bounds) {
       clearTimeout(this.timeout)
 
       this.timeout = setTimeout(() => {
         if (!this.working && this.mapMode === mapModes.default.showJobs) {
           this.working = true
-          getOffersAround(this.lat, this.lng, this.zoom, this.filters, this.$kuzzle, (result) => {
+
+          // Fetching the jobs at the new center
+          getOffersAround(bounds, this.zoom, this.filters, this.$kuzzle, (result) => {
             // Remove layers and source
             if (this.map.getLayer('clusters')) {
               this.map.removeLayer('clusters')
-              this.map.removeLayer('cluster-count')
               this.map.removeLayer('unclustered-point')
             }
 
@@ -98,7 +91,7 @@ export default {
                   'coordinates': [offer.jobPosition.lng, offer.jobPosition.lat]
                 },
                 'properties': {
-                  'title': offer.title,
+                  'title': '',
                   'icon': 'marker'
                 }
               })
@@ -109,11 +102,6 @@ export default {
               'features': this.features
             })
 
-            if (result.limit === true) {
-              this.$toasted.global.toastInfo({
-                message: 'Affichage limité aux 1000 premiers résultats. Merci de filtrer votre recherche!'
-              })
-            }
             this.working = false
           })
         }
@@ -126,49 +114,18 @@ export default {
         data: geoJson,
         cluster: true,
         clusterMaxZoom: 14, // Max zoom to cluster points on
-        clusterRadius: 50 // Radius of each cluster when clustering points (defaults to 50)
+        clusterRadius: this.zoom // Radius of each cluster when clustering points (defaults to 50)
       })
 
       this.map.addLayer({
         id: 'clusters',
         type: 'circle',
         source: 'offers',
-        filter: ['has', 'point_count'],
         layout: {
           visibility: this.showLayers
         },
         paint: {
-          'circle-color': [
-            'step',
-            ['get', 'point_count'],
-            '#51bbd6',
-            100,
-            '#f1f075',
-            750,
-            '#f28cb1'
-          ],
-          'circle-radius': [
-            'step',
-            ['get', 'point_count'],
-            20,
-            100,
-            30,
-            750,
-            40
-          ]
-        }
-      })
-
-      this.map.addLayer({
-        id: 'cluster-count',
-        type: 'symbol',
-        source: 'offers',
-        filter: ['has', 'point_count'],
-        layout: {
-          'text-field': '{point_count_abbreviated}',
-          'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-          'text-size': 12,
-          visibility: this.showLayers
+          'circle-color': '#cc3300'
         }
       })
 
@@ -176,11 +133,8 @@ export default {
         id: 'unclustered-point',
         type: 'circle',
         source: 'offers',
-        filter: ['!has', 'point_count'],
         paint: {
-          'circle-color': '#ff7575',
-          'circle-radius': 5,
-          'circle-stroke-color': '#fff'
+          'circle-color': '#cc3300'
         },
         layout: {
           visibility: this.showLayers
@@ -188,39 +142,50 @@ export default {
       })
     },
 
-    bindEvents () {
-      // this.map
+    bindMapEvents () {
       this.map.on('dragend', () => {
         this.lat = this.map.getCenter().lat
         this.lng = this.map.getCenter().lng
-
-        this.updateJobs()
-      })
-
-      this.map.on('zoom', () => {
-        this.zoom = parseInt(this.map.getZoom())
-
-        if (this.zoom < 9) {
-          this.map.setZoom(9)
-        }
+        this.updateJobs(this.map.getBounds())
       })
 
       this.map.on('zoomend', () => {
-        this.zoom = parseInt(this.map.getZoom())
-
-        if (this.zoom < 9) {
-          this.map.setZoom(9)
-        } else {
-          this.map.setZoom(this.map.getZoom())
-        }
-
-        this.updateJobs()
+        this.zoom = this.map.getZoom()
+        this.updateJobs(this.map.getBounds())
       })
 
       this.map.on('click', (e) => {
         if (this.mapMode === mapModes.default.create) {
           this.createNewJobPosition.lat = e.lngLat.lat
           this.createNewJobPosition.lng = e.lngLat.lng
+
+          if (this.map.getLayer('new-job-point')) {
+            this.map.removeLayer('new-job-point')
+            this.map.removeSource('new-job-point')
+          }
+
+          this.map.addLayer({
+            id: 'new-job-point',
+            type: 'circle',
+            source: {
+              type: 'geojson',
+              data: {
+                type: 'FeatureCollection',
+                features: [{
+                  type: 'Feature',
+                  geometry: {
+                    type: 'Point',
+                    coordinates: [this.createNewJobPosition.lng, this.createNewJobPosition.lat]
+                  }
+                }]
+              }
+            },
+            paint: {
+              'circle-color': '#cc3300'
+            }
+          })
+
+          this.$eventBus.$emit('Jobs::PositionStep1', this.createNewJobPosition)
         }
       })
     }
@@ -230,12 +195,17 @@ export default {
       if (this.mapMode === mapModes.default.create) {
         this.showLayers = 'none'
       } else {
+        // Changing mode => Cancel the layer
+        if (this.map.getLayer('new-job-point')) {
+          this.map.removeLayer('new-job-point')
+        }
+
         this.showLayers = 'visible'
         // Get the points after a cancel where the map is
         this.lat = this.map.getCenter().lat
         this.lng = this.map.getCenter().lng
 
-        this.updateJobs()
+        this.updateJobs(this.map.getBounds())
       }
 
       if (this.map.getLayer('clusters')) {
@@ -262,7 +232,7 @@ export default {
 
     this.$eventBus.$on('Search::FilterSearch', (payload) => {
       this.filters = payload
-      this.updateJobs()
+      this.updateJobs(this.map.getBounds())
     })
 
     mapboxgl.accessToken = 'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
@@ -273,15 +243,24 @@ export default {
       center: [this.lng, this.lat]
     })
 
-    this.bindEvents()
+    this.map.on('load', () => {
+      // Send the information that the map is ready and we can rmeove the loader
+      this.mapLoaded = true
+      this.$eventBus.$emit('UI::MapLoaded')
+    })
+
+    this.bindMapEvents()
   },
   created () {
-    if (navigator.geolocation) {
+    if (navigator && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(this.setPosition)
     }
   }
 }
 </script>
 
-<style lang='css'>
+<style>
+.hidden {
+  visibility: hidden;
+}
 </style>

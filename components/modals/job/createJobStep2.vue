@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { searchJobLabels } from '~/helpers/labelHelper'
+import { searchJobLabels, searchJobsByFullIdentifier } from '~/helpers/labelHelper'
 
 export default {
   name: 'createJobStep2',
@@ -153,9 +153,10 @@ export default {
         return []
       } else {
         let fullIdentifier = this.chosenCategory.category + '-' + this.chosenMidCategory.midCategory + '-' + this.chosenSubCategory.subCategory
-        console.log(fullIdentifier)
-        return Object.keys(this.jobs[fullIdentifier]).map(key => {
-          return {code: this.jobs[fullIdentifier][key].content.code, name: this.jobs[fullIdentifier][key].content.name}
+        this.jobs = searchJobsByFullIdentifier(fullIdentifier)
+
+        return Object.keys(this.jobs).map(key => {
+          return {code: this.jobs[key].content.code, name: this.jobs[key].content.name}
         })
       }
     }
@@ -189,15 +190,15 @@ export default {
       }
     },
     cancel () {
+      // restore map Mode
+      this.$store.commit('map/switchToMapModeShowJobs')
+      this.$eventBus.$emit('Jobs::CancelCreate')
+
       this.resetComponent()
     },
     resetComponent () {
       // Close the form
       this.showForm = false
-
-      // restore map Mode
-      this.$store.commit('map/switchToMapModeShowJobs')
-      this.$eventBus.$emit('Jobs::CancelCreate')
 
       // Restore data
       this.chosenCategory = ''

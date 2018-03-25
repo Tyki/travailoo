@@ -1,31 +1,20 @@
-const zoomToKm = {
-  '1': 1000,
-  '2': 1000,
-  '3': 1000,
-  '4': 1000,
-  '5': 1000,
-  '6': 1000,
-  '7': 1000,
-  '8': 350,
-  '9': 60,
-  '10': 30,
-  '11': 15,
-  '12': 7,
-  '13': 5,
-  '14': 4,
-  '15': 2.5,
-  '16': 1,
-  '17': 1,
-  '18': 0.5,
-  '19': 0.5,
-  '20': 0.25
-}
-
 /**
 * Method to search the jobs around a geopoint
-*
+* @param bounds
+* @param zoom
+* @param filters
+* @param callback
 */
-export const getOffersAround = (lat, lng, zoom, filters, kuzzle, callback) => {
+export const getOffersAround = (bounds, zoom, filters, kuzzle, callback) => {
+  console.log(bounds)
+  var topLeft = {
+    lat: bounds._ne.lat,
+    lon: bounds._sw.lng
+  }
+  var bottomRight = {
+    lat: bounds._sw.lat,
+    lon: bounds._ne.lng
+  }
   var mustFilters = []
   var shouldFilters = []
   if (filters.hasOwnProperty('code') || filters.hasOwnProperty('offerType') || filters.hasOwnProperty('experience')) {
@@ -75,11 +64,10 @@ export const getOffersAround = (lat, lng, zoom, filters, kuzzle, callback) => {
       bool: {
         must: mustFilters,
         filter: {
-          geo_distance: {
-            distance: zoomToKm[zoom] + 'km',
+          geo_bounding_box: {
             jobPosition: {
-              lat,
-              lon: lng
+              top_left: topLeft,
+              bottom_right: bottomRight
             }
           }
         }
