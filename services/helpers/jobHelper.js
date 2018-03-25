@@ -1,22 +1,28 @@
 /**
-* Method to search the jobs around a geopoint
+* Method to search the jobs with geobounds
+*
 * @param bounds
 * @param zoom
 * @param filters
 * @param callback
 */
 export const getOffersAround = (bounds, zoom, filters, kuzzle, callback) => {
-  console.log(bounds)
   var topLeft = {
     lat: bounds._ne.lat,
     lon: bounds._sw.lng
   }
+
   var bottomRight = {
     lat: bounds._sw.lat,
     lon: bounds._ne.lng
   }
+
   var mustFilters = []
   var shouldFilters = []
+
+  /* 
+    Search engine : Construct the ES query based on filled checkboxes
+  */
   if (filters.hasOwnProperty('code') || filters.hasOwnProperty('offerType') || filters.hasOwnProperty('experience')) {
     if (filters.hasOwnProperty('code')) {
       mustFilters.push({
@@ -75,12 +81,9 @@ export const getOffersAround = (bounds, zoom, filters, kuzzle, callback) => {
     }
   }
 
-  console.dir(search, {depth: null})
-
   let options = {
     from: 0,
     size: 1000
-    // scroll: '10s'
   }
 
   let accumulator = {
@@ -110,21 +113,19 @@ export const getOffersAround = (bounds, zoom, filters, kuzzle, callback) => {
         accumulator.limit = true
       }
 
-      console.log(accumulator.offers.length)
-
       callback(accumulator)
     })
 }
 
 /**
 * Scroll search for more points
-* Recursive !
+* Not used - Performances issues ?
 */
 export const scrollSearch = (accumulator, scrollId, kuzzle, callback) => {
   kuzzle.collection('data', 'offers')
     .scroll(scrollId, {scroll: '10s'}, (error, offers) => {
       if (error) {
-        console.error(error)
+        callback(error)
       }
 
       if (offers.getDocuments().length !== 1000) {

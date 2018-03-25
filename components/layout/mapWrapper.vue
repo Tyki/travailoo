@@ -7,8 +7,8 @@
 </template>
 
 <script>
-import * as mapModes from '@/helpers/constants/mapModes'
-import { getOffersAround } from '@/helpers/jobHelper'
+import * as mapModes from '@/services/helpers/constants/mapModes'
+import { getOffersAround } from '@/services/helpers/jobHelper'
 import searchEngine from '@/components/layout/searchEngine'
 
 /* eslint-disable no-undef */

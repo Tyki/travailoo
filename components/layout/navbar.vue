@@ -45,7 +45,7 @@
 </template>
 
 <script>
-import { openSpecificModal } from '~/helpers/eventBus'
+import { openSpecificModal } from '~/services/helpers/eventBus'
 
 export default {
   name: 'navbar',

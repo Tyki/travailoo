@@ -54,7 +54,7 @@
 </template>
 
 <script>
-import { searchJobLabels } from '@/helpers/labelHelper'
+import { searchJobLabels } from '@/services/helpers/labelHelper'
 
 export default {
   name: 'searchEngine',

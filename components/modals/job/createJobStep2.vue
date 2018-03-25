@@ -116,7 +116,7 @@
 </template>
 
 <script>
-import { searchJobLabels, searchJobsByFullIdentifier } from '~/helpers/labelHelper'
+import { searchJobLabels, searchJobsByFullIdentifier } from '~/services/helpers/labelHelper'
 
 export default {
   name: 'createJobStep2',

@@ -10,15 +10,8 @@ export default ({ app }) => {
   app.i18n = new VueI18n({
     locale: 'fr',
     messages: {
-      'fr': require('~/locales/fr.json')
+      'fr': require('~/helpers/translations/fr.json'),
+      'en': require('~/helpers/translations/en.json')
     }
   })
-
-  app.i18n.path = (link) => {
-    if (app.i18n.locale === app.i18n.fallbackLocale) {
-      return `/${link}`
-    }
-
-    return `/${app.i18n.locale}/${link}`
-  }
 }

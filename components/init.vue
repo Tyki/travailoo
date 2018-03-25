@@ -12,7 +12,7 @@
 </template>
 
 <script>
-import { loadJobs } from '~/helpers/labelHelper'
+import { loadJobs } from '~/services/helpers/labelHelper'
 
 export default {
   name: 'init',
