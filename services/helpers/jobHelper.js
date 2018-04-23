@@ -8,13 +8,13 @@
 */
 export const getOffersAround = (bounds, filters, kuzzle, callback) => {
   var topLeft = {
-    lat: bounds._ne.lat,
-    lon: bounds._sw.lng
+    lat: bounds._northEast.lat,
+    lon: bounds._southWest.lng
   }
 
   var bottomRight = {
-    lat: bounds._sw.lat,
-    lon: bounds._ne.lng
+    lat: bounds._southWest.lat,
+    lon: bounds._northEast.lng
   }
 
   var mustFilters = []
@@ -83,8 +83,7 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
 
   let options = {
     from: 0,
-    scroll: '3s',
-    size: 1000
+    size: 9999
   }
 
   let accumulator = []
@@ -96,8 +95,6 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
         return callback(error)
       }
 
-      console.log(offers)
-
       accumulator = offers.getDocuments().map(offer => {
         return {
           ...offer.content,
@@ -108,42 +105,7 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
           }
         }
       })
-
-      if (offers.getDocuments().length === 1000) {
-        return scrollSearch(accumulator, offers.options.scrollId, kuzzle, callback)
-      } else {
-        callback(accumulator)
-      }
-    })
-}
-
-/**
-* Scroll search for more points
-* Not used - Performances issues ?
-*/
-export const scrollSearch = (accumulator, scrollId, kuzzle, callback) => {
-  kuzzle.collection('data', 'offers')
-    .scroll(scrollId, {scroll: '3s'}, (error, offers) => {
-      if (error) {
-        callback(error)
-      }
-
-      offers.getDocuments().forEach(offer => {
-        accumulator.push({
-          ...offer.content,
-          id: offer.id,
-          jobPosition: {
-            lat: offer.content.jobPosition.lat,
-            lng: offer.content.jobPosition.lon
-          }
-        })
-      })
-
-      if (offers.getDocuments().length !== 1000) {
-        return callback(accumulator)
-      } else {
-        return scrollSearch(accumulator, offers.options.scrollId, kuzzle, callback)
-      }
+      callback(accumulator)
     })
 }
 

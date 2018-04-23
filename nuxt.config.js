@@ -13,10 +13,13 @@ module.exports = {
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
       { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' },
       { rel: 'stylesheet', href: 'https://unpkg.com/vuetify@0.17.6/dist/vuetify.min.css' },
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.css' }
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' },
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css'},
+      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css'},
     ],
     script: [
-      { src: 'https://api.mapbox.com/mapbox-gl-js/v0.42.0/mapbox-gl.js' }
+      { src: 'https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js' },
+      { src: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'}
     ]
   },
   /*
