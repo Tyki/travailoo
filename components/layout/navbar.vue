@@ -1,5 +1,5 @@
 <template lang="html">
-  <v-toolbar color="blue" fixed clipped-left app>
+  <v-toolbar color="blue" fixed clipped-left clipped-right app class="elevation-25">
     <!-- Drawer menu and Title -->
     <v-toolbar-title
       :style="$vuetify.breakpoint.width > 1264 && 'width: 300px'"
@@ -19,8 +19,7 @@
         placeholder="Chercher une adresse..."
         style="max-width: 500px; min-width: 128px"
       ></v-text-field>
-      <v-btn color="primary" @click.native="$eventBus.$emit('Search::ShowFilters')">Affiner votre recherche</v-btn>
-
+     <!--  <v-btn color="primary" @click.native="$eventBus.$emit('Search::ShowFilters')">Affiner votre recherche</v-btn> -->
     </v-layout>
 
 

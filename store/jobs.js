@@ -3,7 +3,8 @@ export const state = () => ({
   categories: {},
   midCategories: {},
   subCategories: {},
-  jobs: {}
+  jobs: [],
+  filters: {}
 })
 
 export const mutations = {
@@ -39,5 +40,9 @@ export const mutations = {
 
   addToJobsList (state, documents) {
     state.jobs = documents
+  },
+
+  searchFilters (state, filters) {
+    state.filters = filters
   }
 }

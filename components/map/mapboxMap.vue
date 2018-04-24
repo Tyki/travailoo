@@ -1,7 +1,6 @@
 <template lang='html'>
   <div v-bind:class='{ hidden: !mapLoaded }'>
-    <div id='travailoo-map' style='width: 100vw; height: 100vh' />
-
+    <div id='travailoo-map' style='height: 100vh' />
   </div>
 </template>
 
@@ -13,7 +12,7 @@ import mapboxMarker from '@/components/map/mapboxMarker'
 /* eslint-disable no-undef */
 /* eslint-disable no-new */
 export default {
-  name: 'map',
+  name: 'mapboxMap',
   components: {
     mapboxMarker
   },
@@ -36,6 +35,9 @@ export default {
   computed: {
     mapMode () {
       return this.$store.state.map.mapMode
+    },
+    filters () {
+      return this.$store.state.jobs.filters
     }
   },
   methods: {
@@ -49,10 +51,10 @@ export default {
         this.lng
       ])
 
-      this.updateJobs(this.map.getBounds())
+      this.updateJobs()
     },
 
-    updateJobs (bounds) {
+    updateJobs () {
       clearTimeout(this.timeout)
 
       this.timeout = setTimeout(() => {
@@ -61,30 +63,32 @@ export default {
 
           // Fetching the jobs at the new center
           // TODO : send filters from store
-          getOffersAround(bounds, {}, this.$kuzzle, (result) => {
+          getOffersAround(this.map.getBounds(), this.filters, this.$kuzzle, (result) => {
             if (result.error) {
               console.log(result.error)
-            }
+            } else {
+              var markers = new L.MarkerClusterGroup()
 
-            var markers = new L.MarkerClusterGroup()
+              this.$store.commit('jobs/addToJobsList', result)
 
-            result.forEach(offer => {
-              var marker = L.marker(new L.LatLng(offer.jobPosition.lat, offer.jobPosition.lng), {
-                icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
-                title: offer.title
+              result.forEach(offer => {
+                var marker = L.marker(new L.LatLng(offer.jobPosition.lat, offer.jobPosition.lng), {
+                  icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
+                  title: offer.title
+                })
+
+                marker.bindPopup(offer.title)
+                markers.addLayer(marker)
               })
 
-              marker.bindPopup(offer.title)
-              markers.addLayer(marker)
-            })
+              this.map.addLayer(markers)
 
-            this.map.addLayer(markers)
+              if (this.lastLayer !== null) {
+                this.map.removeLayer(this.lastLayer)
+              }
 
-            if (this.lastLayer !== null) {
-              this.map.removeLayer(this.lastLayer)
+              this.lastLayer = markers
             }
-
-            this.lastLayer = markers
             this.working = false
           })
         }
@@ -93,11 +97,11 @@ export default {
 
     bindMapEvents () {
       this.map.on('dragend', () => {
-        this.updateJobs(this.map.getBounds())
+        this.updateJobs()
       })
 
       this.map.on('zoomend', () => {
-        this.updateJobs(this.map.getBounds())
+        this.updateJobs()
       })
 
       this.map.on('click', (e) => {
@@ -151,17 +155,7 @@ export default {
         this.lat = this.map.getCenter().lat
         this.lng = this.map.getCenter().lng
 
-        this.updateJobs(this.map.getBounds())
-      }
-
-      if (this.map.hasLayer('clusters')) {
-        this.map.setLayoutProperty('clusters', 'visibility', this.showLayers)
-      }
-      if (this.map.hasLayer('cluster-count')) {
-        this.map.setLayoutProperty('cluster-count', 'visibility', this.showLayers)
-      }
-      if (this.map.hasLayer('unclustered-point')) {
-        this.map.setLayoutProperty('unclustered-point', 'visibility', this.showLayers)
+        this.updateJobs()
       }
     }
   },
@@ -172,8 +166,15 @@ export default {
       this.createNewJobPosition.lng = ''
     })
 
+    this.$eventBus.$on('Jobs::UpdateFiltes', () => {
+      // Right panel send an update in filters
+      this.updateJobs()
+    })
+
     L.mapbox.accessToken = 'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
-    this.map = L.mapbox.map('travailoo-map', 'mapbox.streets').setView([this.lng, this.lat], 8)
+    this.map = L.mapbox.map('travailoo-map', 'mapbox.streets', {
+      zoomControl: false
+    }).setView([this.lng, this.lat], 10)
 
     this.bindMapEvents()
   },

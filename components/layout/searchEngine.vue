@@ -1,12 +1,9 @@
 <template lang="html">
-  <transition name="fade">
-    <v-toolbar
-        color="white"
-        floating
-        style="position: absolute; top: 80px; left: 30vw; min-width: 800px;"
-      >
-      <v-layout style="min-width: 800px;">
-        <v-flex xs3>
+  <div>
+    <v-container>
+      <h3>Effectuer une recherche</h3>
+      <v-layout>
+        <v-flex xs12>
           <v-select
             label="Saisissez un intitulé "
             autocomplete
@@ -18,10 +15,12 @@
             item-value="category"
             return-object
             clearable
+            flat
           ></v-select>
         </v-flex>
-        &nbsp;
-        <v-flex xs3>
+      </v-layout>
+      <v-layout>
+        <v-flex xs5>
           <v-select
             v-bind:items="offerTypes"
             v-model="chosenOfferType"
@@ -33,7 +32,7 @@
           ></v-select>
         </v-flex>
         &nbsp;
-        <v-flex xs3>
+        <v-flex xs4>
           <v-select
             v-bind:items="experiences"
             v-model="chosenExperience"
@@ -45,22 +44,27 @@
           ></v-select>
         </v-flex>
         &nbsp;
-        <v-flex xs3>
-          <v-btn color="blue darken-1" style="margin-top: 17px;" @click.native="filterSearch">Appliquer les filtres</v-btn>
+        <v-flex xs1>
+          <v-btn color="blue darken-1" style="margin-top: 17px;" @click.native="filterSearch">
+            <v-icon>search</v-icon>
+          </v-btn>
         </v-flex>
       </v-layout>
-    </v-toolbar>
-  </transition>
+    </v-container>
+
+    <searchResults />
+  </div>
 </template>
 
 <script>
 import { searchJobLabels } from '@/services/helpers/labelHelper'
+import searchResults from '@/components/layout/job/searchResults'
 
 export default {
   name: 'searchEngine',
-  props: [
-    'filters'
-  ],
+  components: {
+    searchResults
+  },
   data: () => ({
     search: null,
     loading: false,
@@ -115,7 +119,7 @@ export default {
         payload.experience = this.chosenExperience
       }
 
-      this.$eventBus.$emit('Search::FilterSearch', payload)
+      // Do the search
     }
   },
   created () {
