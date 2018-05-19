@@ -1,6 +1,7 @@
 <template lang="html">
-  <div>
-    <v-container>
+  <div class="engine_container">
+    <v-container class="engine_header">
+      <!-- @todo: externalize to a component -->
       <h3>Effectuer une recherche</h3>
       <v-layout>
         <v-flex xs12>
@@ -52,7 +53,7 @@
       </v-layout>
     </v-container>
 
-    <searchResults />
+    <searchResults class="engine_results"/>
   </div>
 </template>
 
@@ -122,9 +123,6 @@ export default {
       // Do the search
     }
   },
-  created () {
-    console.log(this.filters)
-  },
   watch: {
     search (val) {
       this.filterJob(val)
@@ -139,5 +137,15 @@ export default {
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
   opacity: 0
+}
+
+.engine_container {
+  margin-top: 64px;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  left: 75%;
+  overflow: auto;
 }
 </style>
