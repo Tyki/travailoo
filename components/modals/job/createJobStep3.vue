@@ -85,16 +85,16 @@
                   <v-layout row>
                     <v-flex xs12>
                       <v-subheader>Description</v-subheader>
-                      <wysiwyg v-model="description" />
+                      <!--<wysiwyg v-model="description" />-->
 
-                      <!-- <v-text-field
+                      <v-text-field
                         name="description"
                         label="Description de l'annonce"
                         textarea
                         v-model="description"
                         :rules="[() => description.length > 0 || 'Ce champ est requis']"
                         required
-                      ></v-text-field> -->
+                      ></v-text-field>
                     </v-flex>
                   </v-layout>
                 </v-flex>

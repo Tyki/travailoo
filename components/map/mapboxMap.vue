@@ -19,10 +19,6 @@ export default {
   data: () => ({
     lat: 48.864716,
     lng: 2.349014,
-    createNewJobPosition: {
-      lat: '',
-      lng: ''
-    },
     zoom: 8,
     map: null,
     timeout: null,
@@ -33,9 +29,6 @@ export default {
     mapLoaded: true
   }),
   computed: {
-    mapMode () {
-      return this.$store.state.map.mapMode
-    },
     filters () {
       return this.$store.state.jobs.filters
     }
@@ -103,69 +96,9 @@ export default {
       this.map.on('zoomend', () => {
         this.updateJobs()
       })
-
-      this.map.on('click', (e) => {
-        if (this.mapMode === mapModes.default.create) {
-          this.createNewJobPosition.lat = e.lngLat.lat
-          this.createNewJobPosition.lng = e.lngLat.lng
-
-          if (this.map.hasLayer('new-job-point')) {
-            this.map.removeLayer('new-job-point')
-            this.map.removeSource('new-job-point')
-          }
-
-          this.map.addLayer({
-            id: 'new-job-point',
-            type: 'circle',
-            source: {
-              type: 'geojson',
-              data: {
-                type: 'FeatureCollection',
-                features: [{
-                  type: 'Feature',
-                  geometry: {
-                    type: 'Point',
-                    coordinates: [this.createNewJobPosition.lng, this.createNewJobPosition.lat]
-                  }
-                }]
-              }
-            },
-            paint: {
-              'circle-color': '#cc3300'
-            }
-          })
-
-          this.$eventBus.$emit('Jobs::PositionStep1', this.createNewJobPosition)
-        }
-      })
-    }
-  },
-  watch: {
-    mapMode () {
-      if (this.mapMode === mapModes.default.create) {
-        this.showLayers = 'none'
-      } else {
-        // Changing mode => Cancel the layer
-        if (this.map.getLayer('new-job-point')) {
-          this.map.removeLayer('new-job-point')
-        }
-
-        this.showLayers = 'visible'
-        // Get the points after a cancel where the map is
-        this.lat = this.map.getCenter().lat
-        this.lng = this.map.getCenter().lng
-
-        this.updateJobs()
-      }
     }
   },
   mounted () {
-    this.$eventBus.$on('Jobs::CancelCreate', () => {
-      // Reset the newJob marker
-      this.createNewJobPosition.lat = ''
-      this.createNewJobPosition.lng = ''
-    })
-
     this.$eventBus.$on('Jobs::UpdateFiltes', () => {
       // Right panel send an update in filters
       this.updateJobs()
@@ -177,8 +110,7 @@ export default {
     }).setView([this.lng, this.lat], 10)
 
     this.bindMapEvents()
-  },
-  created () {
+
     if (navigator && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(this.setPosition)
     }

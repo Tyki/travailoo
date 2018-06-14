@@ -1,14 +1,5 @@
 <template>
-  <v-progress-circular v-if="this.mapLoaded === false"
-    v-bind:size="100"
-    v-bind:width="15"
-    v-bind:rotate="-90"
-    v-bind:value="loadingPercentile"
-    color="primary"
-    style="position: absolute; top:50vh; left:50vw"
-  >
-    {{ loadingPercentile }}
-  </v-progress-circular>
+
 </template>
 
 <script>
@@ -28,6 +19,8 @@ export default {
         }
       }
       let options = { size: 1000 }
+
+      // TODO : store data inside LocalStorage to dodge asking again to server
 
       // Fetch categories
       this.$kuzzle.collection('categories', 'labels').search(body, options, (error, result) => {
