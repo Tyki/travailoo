@@ -1,24 +1,32 @@
-const allJobs = {}
+let allJobs = {}
+
+const LSJobLabelsKey = 'jobLabels'
 
 export const loadJobs = (kuzzle, callback) => {
-  kuzzle.collection('jobs', 'labels').search({query: {match_all: {}}}, {size: 1000, scroll: '1s'}, (error, result) => {
-    if (error) {
-      console.log(error)
-    }
-
-    result.getDocuments().forEach(document => {
-      if (!Array.isArray(allJobs[document.content.fullIdentifier])) {
-        allJobs[document.content.fullIdentifier] = []
+  let labels = localStorage.getItem(LSJobLabelsKey)
+  if (labels === null) {
+    kuzzle.collection('jobs', 'labels').search({query: {match_all: {}}}, {size: 9999, scroll: '1s'}, (error, result) => {
+      if (error) {
+        console.log(error)
       }
-      allJobs[document.content.fullIdentifier].push(document)
-    })
 
-    if (result.options.scrollId && result.getDocuments().length !== 0) {
-      scrollFetchJobs(result.options.scrollId, kuzzle, callback)
-    } else {
-      callback()
-    }
-  })
+      result.getDocuments().forEach(document => {
+        if (!Array.isArray(allJobs[document.content.fullIdentifier])) {
+          allJobs[document.content.fullIdentifier] = []
+        }
+        allJobs[document.content.fullIdentifier].push(document)
+      })
+
+      if (result.options.scrollId && result.getDocuments().length !== 0) {
+        scrollFetchJobs(result.options.scrollId, kuzzle, callback)
+      } else {
+        localStorage.setItem(LSJobLabelsKey, JSON.stringify(allJobs))
+        callback()
+      }
+    })
+  } else {
+    allJobs = JSON.parse(labels)
+  }
 }
 
 /**
@@ -41,6 +49,7 @@ const scrollFetchJobs = (scrollId, kuzzle, callback) => {
       if (result.getDocuments().length !== 0 && result.options.scrollId) {
         scrollFetchJobs(result.options.scrollId, kuzzle, callback)
       } else {
+        localStorage.setItem(LSJobLabelsKey, JSON.stringify(allJobs))
         callback()
       }
     })

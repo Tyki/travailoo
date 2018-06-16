@@ -9,51 +9,78 @@ export default {
   name: 'init',
   data: () => ({
     mapLoaded: false,
-    loadingPercentile: 0
+    loadingPercentile: 0,
+    query: {query: {match_all: {}}},
+    options: {size: 1000}
   }),
   methods: {
-    fetchJobsData () {
-      let body = {
-        query: {
-          match_all: {}
-        }
-      }
-      let options = { size: 1000 }
-
-      // TODO : store data inside LocalStorage to dodge asking again to server
-
-      // Fetch categories
-      this.$kuzzle.collection('categories', 'labels').search(body, options, (error, result) => {
-        if (error) {
-          console.log(error)
-          // Toast error !
-        }
-
-        this.$store.commit('jobs/addToCategories', result.getDocuments())
-        this.loadingPercentile = 25
-
-        // Mid Categories
-        this.$kuzzle.collection('midCategories', 'labels').search(body, options, (error, result) => {
+    fetchCategories: function () {
+      let categories = localStorage.getItem('categories')
+      if (categories === null) {
+        this.$log('Fetch categories from Backend')
+        this.$kuzzle.collection('categories', 'labels').search(this.body, this.options, (error, result) => {
           if (error) {
             console.log(error)
+            // Toast error !
           }
+
+          this.$store.commit('jobs/addToCategories', result.getDocuments())
+          localStorage.setItem('categories', JSON.stringify(result.getDocuments()))
+          this.loadingPercentile = 25
+          this.fetchMidCategories()
+        })
+      } else {
+        this.$log('Fetch categories from localStorage')
+        this.$store.commit('jobs/addToCategories', JSON.parse(categories))
+        this.fetchMidCategories()
+      }
+    },
+    fetchMidCategories: function () {
+      let midCategories = localStorage.getItem('midCategories')
+      if (midCategories === null) {
+        this.$log('Fetch midCategories from Backend')
+        this.$kuzzle.collection('midCategories', 'labels').search(this.body, this.options, (error, result) => {
+          if (error) {
+            console.log(error)
+            // Toast error !
+          }
+
           this.$store.commit('jobs/addToMidCategories', result.getDocuments())
+          localStorage.setItem('midCategories', JSON.stringify(result.getDocuments()))
           this.loadingPercentile = 50
+          this.fetchSubCategories()
+        })
+      } else {
+        this.$log('Fetch midCategories from localStorage')
+        this.$store.commit('jobs/addToMidCategories', JSON.parse(midCategories))
+        this.fetchSubCategories()
+      }
+    },
+    fetchSubCategories: function () {
+      let subCategories = localStorage.getItem('subCategories')
+      if (subCategories === null) {
+        this.$log('Fetch subCategories from Backend')
+        this.$kuzzle.collection('subCategories', 'labels').search(this.body, this.options, (error, result) => {
+          if (error) {
+            console.log(error)
+            // Toast error !
+          }
 
-          // Sub Categories
-          this.$kuzzle.collection('subCategories', 'labels').search(body, options, (error, result) => {
-            if (error) {
-              console.log(error)
-            }
-            this.$store.commit('jobs/addToSubCategories', result.getDocuments())
-            this.loadingPercentile = 75
+          this.$store.commit('jobs/addToSubCategories', result.getDocuments())
+          localStorage.setItem('subCategories', JSON.stringify(result.getDocuments()))
+          this.loadingPercentile = 75
 
-            loadJobs(this.$kuzzle, () => {
-              this.loadingPercentile = 100
-            })
+          loadJobs(this.$kuzzle, () => {
+            this.loadingPercentile = 100
           })
         })
-      })
+      } else {
+        this.$log('Fetch subCategories from localStorage')
+        this.$store.commit('jobs/addToSubCategories', JSON.parse(subCategories))
+        loadJobs(this.$kuzzle, () => {
+          this.loadingPercentile = 100
+        })
+      }
     }
   },
   mounted () {
@@ -89,7 +116,7 @@ export default {
       })
     }
 
-    this.fetchJobsData()
+    this.fetchCategories()
 
     this.$kuzzle.addListener('tokenExpired', () => {
       this.$store.commit('user/changeLoggedStatus', false)
