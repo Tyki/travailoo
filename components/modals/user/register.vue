@@ -48,7 +48,7 @@
 import { openSpecificModal } from '~/services/helpers/eventBus'
 
 export default {
-  name: 'register',
+  name: 'registerModal',
   data: () => ({
     dialog: false,
     valid: false,

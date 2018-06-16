@@ -1,5 +1,5 @@
 <template>
-  <div id='travailoo-map' style="height: 300px;"></div>
+  <div id='travailoo-map-picker' style="height: 300px;"></div>
 </template>
 
 <script>
@@ -8,8 +8,8 @@
 export default {
   name: 'miniMapPicker',
   data: () => ({
-    lat: 2.34,
-    lng: 48.864716,
+    lat: 48.864716,
+    lng: 2.34,
     map: null,
     marker: null
   }),
@@ -27,7 +27,7 @@ export default {
   },
   mounted () {
     L.mapbox.accessToken = 'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
-    this.map = L.mapbox.map('travailoo-map', 'mapbox.streets', {
+    this.map = L.mapbox.map('travailoo-map-picker', 'mapbox.streets', {
       zoomControl: false
     }).setView([this.lng, this.lat], 10)
 

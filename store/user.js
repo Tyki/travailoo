@@ -1,6 +1,7 @@
 export const state = () => ({
   // User
   isUserLogged: false,
+  userId: '',
   userInformations: {
     firstname: ''
   },
@@ -15,5 +16,8 @@ export const mutations = {
   },
   updateUserFirstname (state, firstname) {
     state.userInformations.firstname = firstname
+  },
+  updateUserId (state, userId) {
+    state.userId = userId
   }
 }

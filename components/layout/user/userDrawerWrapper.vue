@@ -23,7 +23,7 @@
         </v-list-tile-action>
         <v-list-tile-content>
           <v-list-tile-title>
-            Déposer une annonce
+            Soumettre une annonce
           </v-list-tile-title>
         </v-list-tile-content>
       </v-list-tile>
@@ -81,7 +81,8 @@ export default {
       // Close the drawer
       this.drawer = !this.drawer
       // Open the first modal
-      this.$eventBus.$emit('Jobs::StartCreate')
+      console.log('Emit to Jobs::AddJob')
+      this.$eventBus.$emit('Jobs::AddJob')
     }
   },
   mounted () {

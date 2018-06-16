@@ -27,6 +27,11 @@ import Logo from '~/components/Logo.vue'
 export default {
   components: {
     Logo
+  },
+  created () {
+    if (this.getParametersByName('debug') === 'true') {
+      localStorage.setItem('debug', true)
+    }
   }
 }
 </script>

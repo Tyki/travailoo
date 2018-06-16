@@ -76,6 +76,8 @@ export default {
               // Do nothing
             }
 
+            this.$store.commit('user/updateUserId', user.id)
+
             if (user.hasOwnProperty('content') && user.content.hasOwnProperty('firstname')) {
               this.$store.commit('user/updateUserFirstname', user.content.firstname)
             }

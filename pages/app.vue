@@ -1,15 +1,15 @@
-<template lang="html">
-  <v-app id="inspire">
+<template lang='html'>
+  <v-app id='inspire'>
       <!-- Load the map on the client-side  -->
       <init />
-      <v-layout class="main-layout">
+      <v-layout class='main-layout'>
         <v-flex xs9>
           <no-ssr>
-            <mapboxMap class="map-layout"/>      
+            <mapboxMap class='map-layout'/>      
           </no-ssr>
         </v-flex>
 
-        <v-flex xs3 class="elevation-25">
+        <v-flex xs3 class='elevation-25'>
           <search-engine />
         </v-flex>
       </v-layout>
@@ -47,10 +47,34 @@ export default {
       showInit: true
     }
   },
+  methods: {
+    getParametersByName: function (name) {
+      // SSR compliant
+      if (!window || !window.location || !window.location.href) {
+        return null
+      }
+
+      let url = window.location.href
+      /* eslint-disable no-useless-escape */
+      name = name.replace(/[\[\]]/g, '\\$&')
+
+      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
+      var results = regex.exec(url)
+
+      if (!results) return null
+      if (!results[2]) return ''
+
+      return decodeURIComponent(results[2].replace(/\+/g, ' '))
+    }
+  },
   mounted () {
     this.$eventBus.$on('Search::ShowFilters', () => {
       this.showFilters = !this.showFilters
     })
+
+    if (this.getParametersByName('debug') === 'true') {
+      localStorage.setItem('debug', true)
+    }
   }
 }
 </script>

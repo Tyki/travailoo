@@ -5,31 +5,21 @@
         <v-card-title>
           <span class="headline">{{ $t('modals.login.title') }}</span>
         </v-card-title>
+
         <v-card-text>
           <v-form v-model="valid" ref="form" lazy-validation>
             <v-container grid-list-md>
               <v-layout wrap>
                 <v-flex xs12>
-                  <v-text-field
-                    :label="$t('modals.login.email_label')"
-                    v-model="email"
-                    :rules="emailRules"
-                  ></v-text-field>
+                  <v-text-field :label="$t('modals.login.email_label')" :rules="emailRules" v-model="email" @keyup="keyupEvent"/>
                 </v-flex>
 
                 <v-flex xs12>
-                  <v-text-field
-                    :label="$t('modals.login.password_label')"
-                    v-model="password"
-                    type="password"
-                  ></v-text-field>
+                  <v-text-field :label="$t('modals.login.password_label')" v-model="password" type="password" @keyup="keyupEvent" />
                 </v-flex>
 
                 <v-flex xs8>
-                  <v-checkbox
-                    :label="$t('modals.login.stay_connnected_label')"
-                    v-model="stayConnected"
-                  ></v-checkbox>
+                  <v-checkbox :label="$t('modals.login.stay_connnected_label')" v-model="stayConnected" />
                 </v-flex>
               </v-layout>
             </v-container>
@@ -37,6 +27,7 @@
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
+          TODO : MDP Oublié
           <v-btn color="blue darken-1" flat @click.native="openRegister">{{ $t('modals.login.register') }}</v-btn>
           <v-btn color="blue darken-1" @click.native="logUser">{{ $t('modals.login.connect') }}</v-btn>
         </v-card-actions>
@@ -50,7 +41,7 @@
 import { openSpecificModal } from '~/services/helpers/eventBus'
 
 export default {
-  name: 'login',
+  name: 'loginModal',
   data: () => ({
     dialog: false,
     valid: false,
@@ -64,7 +55,7 @@ export default {
     ]
   }),
   methods: {
-    logUser () {
+    logUser: function () {
       const data = {username: this.email.toLowerCase(), password: this.password}
       this.$kuzzle.login('local', data, this.stayConnected ? '385 days' : '12h', (error, response) => {
         if (error) {
@@ -89,6 +80,7 @@ export default {
         this.$kuzzle.whoAmI((error, user) => {
           if (error) { this.$toasted.global.toastError() }
 
+          this.$store.commit('user/updateUserId', user.id)
           if (user.hasOwnProperty('content') && user.content.hasOwnProperty('firstname')) {
             this.$store.commit('user/updateUserFirstname', user.content.firstname)
           }
@@ -101,8 +93,14 @@ export default {
         })
       })
     },
-    openRegister () {
+    openRegister: function () {
       openSpecificModal('openRegister')
+    },
+    keyupEvent: function (e) {
+      if (e.keyCode === 13) {
+        // Enter button
+        this.logUser()
+      }
     }
   },
   mounted () {

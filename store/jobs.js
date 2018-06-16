@@ -13,8 +13,6 @@ export const mutations = {
       state.categories[document.content.category] = document.content.name
       // state.categories.push(document.content)
     })
-
-    console.log(state.categories)
   },
 
   addToMidCategories (state, documents) {

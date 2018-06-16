@@ -5,17 +5,13 @@
 </template>
 
 <script>
-import * as mapModes from '@/services/constants/mapModes'
 import { getOffersAround } from '@/services/helpers/jobHelper'
-import mapboxMarker from '@/components/map/mapboxMarker'
 
 /* eslint-disable no-undef */
 /* eslint-disable no-new */
 export default {
   name: 'mapboxMap',
-  components: {
-    mapboxMarker
-  },
+
   data: () => ({
     lat: 48.864716,
     lng: 2.349014,
@@ -24,9 +20,8 @@ export default {
     timeout: null,
     features: [],
     working: false,
-    showLayers: 'visible',
     lastLayer: null,
-    mapLoaded: true
+    mapLoaded: false
   }),
   computed: {
     filters () {
@@ -51,7 +46,7 @@ export default {
       clearTimeout(this.timeout)
 
       this.timeout = setTimeout(() => {
-        if (!this.working && this.mapMode === mapModes.default.showJobs) {
+        if (!this.working) {
           this.working = true
 
           // Fetching the jobs at the new center
@@ -114,6 +109,9 @@ export default {
     if (navigator && navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(this.setPosition)
     }
+
+    this.updateJobs()
+    this.mapLoaded = true
   }
 }
 </script>
