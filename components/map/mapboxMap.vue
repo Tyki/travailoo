@@ -21,7 +21,10 @@ export default {
     features: [],
     working: false,
     lastLayer: null,
-    mapLoaded: false
+    mapLoaded: false,
+    markerDictionary: {},
+    originalPosition: {},
+    originalZoom: {}
   }),
   computed: {
     filters () {
@@ -39,6 +42,9 @@ export default {
         this.lng
       ])
 
+      this.originalPosition = this.map.getCenter()
+      this.originalZoom = this.map.getZoom()
+
       this.updateJobs()
     },
 
@@ -55,8 +61,10 @@ export default {
             if (result.error) {
               console.log(result.error)
             } else {
-              var markers = new L.MarkerClusterGroup()
+              // Empty the dictionary
+              // this.markerDictionary = {}
 
+              var markers = new L.MarkerClusterGroup()
               this.$store.commit('jobs/addToJobsList', result)
 
               result.forEach(offer => {
@@ -64,6 +72,8 @@ export default {
                   icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
                   title: offer.title
                 })
+
+                // this.markerDictionary[offer.id] = marker
 
                 marker.bindPopup(offer.title)
                 markers.addLayer(marker)
@@ -85,11 +95,20 @@ export default {
 
     bindMapEvents () {
       this.map.on('dragend', () => {
+        this.originalPosition = this.map.getCenter()
+        this.originalZoom = this.map.getZoom()
+
         this.updateJobs()
       })
 
       this.map.on('zoomend', () => {
+        this.originalZoom = this.map.getZoom()
+
         this.updateJobs()
+      })
+
+      this.map.on('click', () => {
+        this.$eventBus.$emit('Jobs::closeFocusJob')
       })
     }
   },
@@ -98,6 +117,22 @@ export default {
       // Right panel send an update in filters
       this.updateJobs()
     })
+
+    // TODO : to debug
+    /* this.$eventBus.$on('Map::FlyTo', (payload) => {
+      if (payload.to === 'original') {
+        this.map.setView([
+          this.originalPosition.lat,
+          this.originalPosition.lng
+        ], this.originalZoom)
+      } else {
+        let position = payload.to.position
+        this.map.setView([
+          position.lat,
+          position.lng
+        ], 15)
+      }
+    }) */
 
     L.mapbox.accessToken = 'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
     this.map = L.mapbox.map('travailoo-map', 'mapbox.streets', {

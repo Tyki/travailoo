@@ -3,6 +3,7 @@
     <RegisterModal />
     <LoginModal />
     <AddJobModal />
+    <JobRightPanel />
   </div>
 </template>
 
@@ -10,13 +11,15 @@
 import RegisterModal from '~/components/modals/user/register'
 import LoginModal from '~/components/modals/user/login'
 import AddJobModal from '~/components/modals/job/addJob'
+import JobRightPanel from '~/components/modals/job/rightPanelJob'
 
 export default {
   name: 'modalWrapper',
   components: {
     RegisterModal,
     LoginModal,
-    AddJobModal
+    AddJobModal,
+    JobRightPanel
   }
 }
 </script>

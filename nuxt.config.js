@@ -55,5 +55,8 @@ module.exports = {
     '~plugins/init',
     '~/plugins/i18n.js',
     {ssr: false, src: '~/plugins/toast'}
+  ],
+  modules: [
+    '@nuxtjs/pwa'
   ]
 }

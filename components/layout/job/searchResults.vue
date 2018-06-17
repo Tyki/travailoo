@@ -1,21 +1,21 @@
 <template>
-  <v-container :grid-list-2="true" fluid>
+  <v-container :grid-list-2="true">
     <h4>Résultats de recherche</h4>
     <v-layout row wrap>
       <v-flex xs6 v-for="(job, key) in elements" :key="key">
-        <job-card :jobData="job" />
+        <job-preview :jobData="job" />
       </v-flex>      
     </v-layout>
   </v-container>
 </template>
 
 <script>
-import jobCard from '@/components/layout/job/jobCard'
+import jobPreview from '@/components/layout/job/jobPreview'
 
 export default {
   name: 'searchResults',
   components: {
-    jobCard
+    jobPreview
   },
   data: () => ({
     page: 1,
@@ -26,7 +26,7 @@ export default {
       return this.$store.state.jobs.jobs
     },
     elements: function () {
-      return this.jobs.slice((this.page * this.elementsPerPage), ((this.page + 1) * this.elementsPerPage))
+      return this.jobs.slice(((this.page - 1) * this.elementsPerPage), (this.page * this.elementsPerPage))
     }
   }
 }
