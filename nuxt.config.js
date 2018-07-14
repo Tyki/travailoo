@@ -19,7 +19,9 @@ module.exports = {
     ],
     script: [
       { src: 'https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js' },
-      { src: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'}
+      { src: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'},
+      // TODO : add the service worker there
+      // { src:' ./'}
     ]
   },
   /*

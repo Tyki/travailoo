@@ -48,6 +48,12 @@ export default {
       this.updateJobs()
     },
 
+    clickMarker (e) {
+      console.log(e.target._leaflet_id)
+      console.log(this.markerDictionary)
+      this.$eventBus.$emit('Jobs::focusJob', this.jobData)
+    },
+
     updateJobs () {
       clearTimeout(this.timeout)
 
@@ -62,20 +68,24 @@ export default {
               console.log(result.error)
             } else {
               // Empty the dictionary
-              // this.markerDictionary = {}
+              this.markerDictionary = {}
 
               var markers = new L.MarkerClusterGroup()
               this.$store.commit('jobs/addToJobsList', result)
 
-              result.forEach(offer => {
+              Object.keys(result).forEach(id => {
+                let offer = result[id]
                 var marker = L.marker(new L.LatLng(offer.jobPosition.lat, offer.jobPosition.lng), {
                   icon: L.mapbox.marker.icon({'marker-symbol': 'post', 'marker-color': '0044FF'}),
-                  title: offer.title
+                  title: offer.title,
+                  riseOnHover: false // Set to true for paid ads
                 })
 
-                // this.markerDictionary[offer.id] = marker
+                marker.on('click', this.clickMarker)
 
-                marker.bindPopup(offer.title)
+                console.log(marker)
+                this.markerDictionary[marker._leaflet_id] = id
+
                 markers.addLayer(marker)
               })
 
@@ -107,7 +117,7 @@ export default {
         this.updateJobs()
       })
 
-      this.map.on('click', () => {
+      this.map.on('click', (e) => {
         this.$eventBus.$emit('Jobs::closeFocusJob')
       })
     }

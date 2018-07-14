@@ -86,17 +86,17 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
     size: 9999
   }
 
-  let accumulator = []
+  let accumulator = {}
 
   kuzzle.collection('data', 'offers')
-    .search(search, options, (error, offers) => {
+    .search(search, options, (error, result) => {
       if (error) {
         console.error(error)
         return callback(error)
       }
 
-      accumulator = offers.getDocuments().map(offer => {
-        return {
+      result.getDocuments().forEach(offer => {
+        accumulator[offer.id] = {
           ...offer.content,
           id: offer.id,
           jobPosition: {
@@ -105,6 +105,7 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
           }
         }
       })
+
       callback(accumulator)
     })
 }

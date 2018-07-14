@@ -68,9 +68,10 @@ export default {
           } else {
             this.$toasted.global.toastError()
           }
+          return
         }
 
-        if (this.stayConnected) {
+        if (this.stayConnected && response.jwt) {
           localStorage.setItem('jwt', response.jwt)
         }
 

@@ -47,34 +47,10 @@ export default {
       showInit: true
     }
   },
-  methods: {
-    getParametersByName: function (name) {
-      // SSR compliant
-      if (!window || !window.location || !window.location.href) {
-        return null
-      }
-
-      let url = window.location.href
-      /* eslint-disable no-useless-escape */
-      name = name.replace(/[\[\]]/g, '\\$&')
-
-      var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
-      var results = regex.exec(url)
-
-      if (!results) return null
-      if (!results[2]) return ''
-
-      return decodeURIComponent(results[2].replace(/\+/g, ' '))
-    }
-  },
   mounted () {
     this.$eventBus.$on('Search::ShowFilters', () => {
       this.showFilters = !this.showFilters
     })
-
-    if (this.getParametersByName('debug') === 'true') {
-      localStorage.setItem('debug', true)
-    }
   }
 }
 </script>

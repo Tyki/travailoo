@@ -1,6 +1,6 @@
 <template>
   <v-card style="margin: 5px">
-    <v-card-media src="https://vuetifyjs.com/static/doc-images/cards/desert.jpg" height="200px" @click.stop="openFullPreview">
+    <v-card-media src="http://via.placeholder.com/400x200" height="200px" @click.stop="openFullPreview">
     </v-card-media>
     <v-card-title primary-title @click.stop="openFullPreview">
       <div>
@@ -27,7 +27,6 @@ export default {
     },
 
     openFullPreview: function () {
-      console.log('click')
       this.$eventBus.$emit('Jobs::focusJob', this.jobData)
       this.$eventBus.$emit('Map::FlyTo', {to: {
         position: this.jobData.jobPosition

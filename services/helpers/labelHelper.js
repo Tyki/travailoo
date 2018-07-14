@@ -61,7 +61,7 @@ const scrollFetchJobs = (scrollId, kuzzle, callback) => {
  */
 export const searchJobLabels = (searchTerm) => {
   var result = []
-  if (searchTerm.toLowerCase() === '') {
+  if (!searchTerm || searchTerm.toLowerCase() === '') {
     return result
   }
 

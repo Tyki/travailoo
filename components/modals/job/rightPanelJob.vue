@@ -87,7 +87,6 @@ export default {
   }),
   mounted () {
     this.$eventBus.$on('Jobs::focusJob', (job) => {
-      console.log(job)
       this.data = job
       this.drawer = true
     })

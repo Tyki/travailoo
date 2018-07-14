@@ -2,10 +2,12 @@
   <v-container :grid-list-2="true">
     <h4>Résultats de recherche</h4>
     <v-layout row wrap>
-      <v-flex xs6 v-for="(job, key) in elements" :key="key">
-        <job-preview :jobData="job" />
+      <v-flex xs6 v-for="(id) in elements" :key="id">
+        <job-preview :jobData="jobs[id]" />
       </v-flex>      
     </v-layout>
+
+    TODO : find a way to make css fill to the bottom
   </v-container>
 </template>
 
@@ -26,14 +28,8 @@ export default {
       return this.$store.state.jobs.jobs
     },
     elements: function () {
-      return this.jobs.slice(((this.page - 1) * this.elementsPerPage), (this.page * this.elementsPerPage))
+      return Object.keys(this.jobs).slice(((this.page - 1) * this.elementsPerPage), (this.page * this.elementsPerPage))
     }
   }
 }
 </script>
-
-<style>
-.searchResults_content {
-  background-color: lightgrey;
-}
-</style>
