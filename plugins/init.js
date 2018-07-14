@@ -32,5 +32,31 @@ const loggerError = function (message) {
   }
 }
 
+const inBrowser = (typeof navigator !== 'undefined')
+
+function getParametersByName (name) {
+  console.log(inBrowser)
+  // SSR compliant
+  if (!inBrowser) {
+    return null
+  }
+
+  let url = window.location.href
+  /* eslint-disable no-useless-escape */
+  name = name.replace(/[\[\]]/g, '\\$&')
+
+  var regex = new RegExp('[?&]' + name + '(=([^&#]*)|&|#|$)')
+  var results = regex.exec(url)
+
+  if (!results) return null
+  if (!results[2]) return ''
+
+  return decodeURIComponent(results[2].replace(/\+/g, ' '))
+}
+
+if (getParametersByName('debug') === 'true') {
+  localStorage.setItem('debug', true)
+}
+
 Vue.prototype.$log = logger
 Vue.prototype.$logError = loggerError
