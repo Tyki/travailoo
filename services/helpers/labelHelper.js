@@ -97,3 +97,17 @@ export const searchJobsByFullIdentifier = (fullIdentifier) => {
     return []
   }
 }
+
+export const getCategoriesForCode = (code) => {
+  let result = null
+  Object.keys(allJobs).forEach(fullIdentifier => {
+    allJobs[fullIdentifier].forEach(job => {
+      // console.log(job.content.code)
+      if (job.content.code === code) {
+        result = job.content.fullIdentifier
+      }
+    })
+  })
+
+  return result
+}
