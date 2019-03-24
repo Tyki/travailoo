@@ -1,11 +1,11 @@
 /**
-* Method to search the jobs with geobounds
-*
-* @param bounds
-* @param zoom
-* @param filters
-* @param callback
-*/
+ * Method to search the jobs with geobounds
+ *
+ * @param bounds
+ * @param zoom
+ * @param filters
+ * @param callback
+ */
 export const getOffersAround = (bounds, filters, kuzzle, callback) => {
   var topLeft = {
     lat: bounds._northEast.lat,
@@ -23,7 +23,11 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
   /*
     Search engine : Construct the ES query based on filled checkboxes
   */
-  if (filters.hasOwnProperty('code') || filters.hasOwnProperty('offerType') || filters.hasOwnProperty('experience')) {
+  if (
+    filters.hasOwnProperty('code') ||
+    filters.hasOwnProperty('offerType') ||
+    filters.hasOwnProperty('experience')
+  ) {
     if (filters.hasOwnProperty('code')) {
       mustFilters.push({
         term: {
@@ -88,7 +92,8 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
 
   let accumulator = {}
 
-  kuzzle.collection('data', 'offers')
+  kuzzle
+    .collection('data', 'offers')
     .search(search, options, (error, result) => {
       if (error) {
         console.error(error)
@@ -110,6 +115,6 @@ export const getOffersAround = (bounds, filters, kuzzle, callback) => {
     })
 }
 
-const isNumber = (n) => {
+const isNumber = n => {
   return !isNaN(parseFloat(n)) && isFinite(n)
 }

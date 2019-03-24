@@ -12,30 +12,25 @@ Vue.use(Vuetify)
 // Init the eventBus
 Vue.prototype.$eventBus = EventBus
 
-// Init the kuzzle websocket
-const kuzzle = new Kuzzle(process.env.KUZZLE_HOST)
-
-// Inject Kuzzle in Vue prototype
-Vue.prototype.$kuzzle = kuzzle
-
-const logger = function (message) {
+const logger = function(...message) {
   if (window && localStorage && localStorage.getItem('debug')) {
-    // TODO : needs to be multi-argument aware
     console.log(message)
   }
 }
 
-const loggerError = function (message) {
+const loggerError = function(...message) {
   if (window && localStorage && localStorage.getItem('debug')) {
-    // TODO : needs to be multi-argument aware
     console.error(message)
   }
 }
 
-const inBrowser = (typeof navigator !== 'undefined')
+const inBrowser = typeof navigator !== 'undefined'
+if (inBrowser) {
+  // Inject Kuzzle in Vue prototype
+  Vue.prototype.$kuzzle = new Kuzzle(process.env.KUZZLE_HOST)
+}
 
-function getParametersByName (name) {
-  console.log(inBrowser)
+function getParametersByName(name) {
   // SSR compliant
   if (!inBrowser) {
     return null
@@ -55,8 +50,19 @@ function getParametersByName (name) {
 }
 
 if (getParametersByName('debug') === 'true') {
-  localStorage.setItem('debug', true)
+  localStorage.setItem('debug', 'true')
 }
 
 Vue.prototype.$log = logger
 Vue.prototype.$logError = loggerError
+
+Vue.mixin({
+  computed: {
+    isUserLogged() {
+      return this.$store.state.user.isUserLogged
+    },
+    userInformations() {
+      return this.$store.state.user.userInformations
+    }
+  }
+})

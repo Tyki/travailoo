@@ -3,7 +3,7 @@ export const state = () => ({
 })
 
 export const mutations = {
-  debug (state, debugActivated) {
+  debug(state, debugActivated) {
     state.debug = debugActivated
   }
 }

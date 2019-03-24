@@ -1,7 +1,7 @@
 module.exports = {
   /*
-  ** Headers of the page
-  */
+   ** Headers of the page
+   */
   head: {
     title: 'Travailoo',
     meta: [
@@ -11,31 +11,52 @@ module.exports = {
     ],
     link: [
       { rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' },
-      { rel: 'stylesheet', href: 'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons' },
-      { rel: 'stylesheet', href: 'https://unpkg.com/vuetify@0.17.6/dist/vuetify.min.css' },
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css' },
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css'},
-      { rel: 'stylesheet', href: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css'},
+      {
+        rel: 'stylesheet',
+        href:
+          'https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Material+Icons'
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://unpkg.com/vuetify/dist/vuetify.min.css'
+      },
+      {
+        rel: 'stylesheet',
+        href: 'https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.css'
+      },
+      {
+        rel: 'stylesheet',
+        href:
+          'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.css'
+      },
+      {
+        rel: 'stylesheet',
+        href:
+          'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/MarkerCluster.Default.css'
+      }
     ],
     script: [
       { src: 'https://api.mapbox.com/mapbox.js/v3.1.1/mapbox.js' },
-      { src: 'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'},
+      {
+        src:
+          'https://api.mapbox.com/mapbox.js/plugins/leaflet-markercluster/v1.0.0/leaflet.markercluster.js'
+      }
       // TODO : add the service worker there
       // { src:' ./'}
     ]
   },
   /*
-  ** Customize the progress bar color
-  */
+   ** Customize the progress bar color
+   */
   loading: { color: '#3B8070' },
   /*
-  ** Build configuration
-  */
+   ** Build configuration
+   */
   build: {
     /*
-    ** Run ESLint on save
-    */
-    extend (config, ctx) {
+     ** Run ESLint on save
+     */
+    extend(config, ctx) {
       if (ctx.dev && ctx.isClient) {
         config.module.rules.push({
           enforce: 'pre',
@@ -51,14 +72,12 @@ module.exports = {
     KUZZLE_HOST: 'localhost'
   },
   /*
-  ** Plugins
-  */
+   ** Plugins
+   */
   plugins: [
     '~plugins/init',
     '~/plugins/i18n.js',
-    {ssr: false, src: '~/plugins/toast'}
+    { ssr: false, src: '~/plugins/toast' }
   ],
-  modules: [
-    '@nuxtjs/pwa'
-  ]
+  modules: ['@nuxtjs/pwa']
 }

@@ -1,5 +1,5 @@
 <template>
-  <div id='travailoo-map-picker' style="height: 300px;"></div>
+  <div id="travailoo-map-picker" style="height: 300px;"></div>
 </template>
 
 <script>
@@ -14,24 +14,24 @@ export default {
     marker: null
   }),
   methods: {
-    setPosition (position) {
+    setPosition(position) {
       this.lat = position.coords.latitude
       this.lng = position.coords.longitude
 
-      // Set center on the map
-      this.map.setView([
-        this.lat,
-        this.lng
-      ])
+      // Set center on the Map
+      this.map.setView([this.lat, this.lng])
     }
   },
-  mounted () {
-    L.mapbox.accessToken = 'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
-    this.map = L.mapbox.map('travailoo-map-picker', 'mapbox.streets', {
-      zoomControl: false
-    }).setView([this.lng, this.lat], 10)
+  mounted() {
+    L.mapbox.accessToken =
+      'pk.eyJ1IjoieGdhcmEiLCJhIjoiY2pjczNpZHd4Mjh5ZTJ3cm9qOWVweGh2diJ9.R_ISD6-vHwKeBvh8hZWaIA'
+    this.map = L.mapbox
+      .map('travailoo-Map-picker', 'mapbox.streets', {
+        zoomControl: false
+      })
+      .setView([this.lng, this.lat], 10)
 
-    this.map.on('click', (event) => {
+    this.map.on('click', event => {
       if (this.marker) {
         this.map.removeLayer(this.marker)
       }
@@ -49,4 +49,3 @@ export default {
   }
 }
 </script>
-

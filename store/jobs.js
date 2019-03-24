@@ -8,39 +8,43 @@ export const state = () => ({
 })
 
 export const mutations = {
-  addToCategories (state, documents) {
+  addToCategories(state, documents) {
     documents.forEach(document => {
       state.categories[document.content.category] = document.content.name
       // state.categories.push(document.content)
     })
   },
 
-  addToMidCategories (state, documents) {
+  addToMidCategories(state, documents) {
     documents.forEach(document => {
       if (!state.midCategories[document.content.category]) {
         state.midCategories[document.content.category] = {}
       }
 
-      state.midCategories[document.content.category][document.content.midCategory] = document.content.name
+      state.midCategories[document.content.category][
+        document.content.midCategory
+      ] = document.content.name
     })
   },
 
-  addToSubCategories (state, documents) {
+  addToSubCategories(state, documents) {
     documents.forEach(document => {
-      let identifier = document.content.category + '-' + document.content.midCategory
+      let identifier =
+        document.content.category + '-' + document.content.midCategory
       if (!state.subCategories[identifier]) {
         state.subCategories[identifier] = {}
       }
 
-      state.subCategories[identifier][document.content.subCategory] = document.content.name
+      state.subCategories[identifier][document.content.subCategory] =
+        document.content.name
     })
   },
 
-  addToJobsList (state, documents) {
+  addToJobsList(state, documents) {
     state.jobs = documents
   },
 
-  searchFilters (state, filters) {
+  searchFilters(state, filters) {
     state.filters = filters
   }
 }
