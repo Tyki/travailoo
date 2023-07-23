@@ -1,0 +1,12 @@
+{
+  "name": "travailoo",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "front": "cd frontend && npm run dev"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC"
+}

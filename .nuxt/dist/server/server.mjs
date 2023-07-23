@@ -1,0 +1,1 @@
+export { default } from "file:///home/gara/www/travailoo/node_modules/@nuxt/vite-builder/dist/runtime/vite-node.mjs"
