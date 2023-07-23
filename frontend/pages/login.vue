@@ -13,7 +13,7 @@
 
       <v-card-actions>
         <v-spacer />
-        <v-btn @click="signup" variant="tonal" :loading="loading">S'inscrire</v-btn>
+        <v-btn @click="login" variant="tonal" :loading="loading">Se connecter</v-btn>
       </v-card-actions>
     </v-card>
   </NuxtLayout>
@@ -21,14 +21,17 @@
 
 <script setup lang="ts">
 import { useKuzzleClient } from '~~/composables/kuzzleClient'
+import { useUserStore } from '~~/stores/user'
+
 const { client } = useKuzzleClient()
+const userStore = useUserStore()
 
 const email = ref('')
 const password = ref('')
 const loading = ref(false)
 const error = ref()
 
-const signup = async () => {
+const login = async () => {
   // TODO: validation
   if (!email.value || !password.value) return
 
@@ -36,20 +39,14 @@ const signup = async () => {
   error.value = null
 
   try {
-    const result = await client.security.createRestrictedUser({
-      content: {
-        email: email.value,
-        type: 'customer'
-      },
-      credentials: {
-        local: {
-          username: email.value,
-          password: password.value
-        }
-      }
-    })
+    const result = await client.auth.login('local', { username: email.value, password: password.value}, '8h')
 
-    console.log(result)
+    if (result) {
+      userStore.jwt = result
+      navigateTo('/')
+    } else {
+      error.value = 'Une erreur est survenue'
+    }
   } catch (e) {
     error.value = 'Une erreur est survenue'
   } finally {
